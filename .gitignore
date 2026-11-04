@@ -1,0 +1,12 @@
+target/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+*.log
+.DS_Store
+data/
+.claude/learning/
+.cursor/learning/
+.kiro/learning/
