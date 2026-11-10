@@ -32,7 +32,7 @@ public record InferenceConfig(
     }
 
     private static String env(String key, String defaultValue) {
-        String value = System.getenv(key);
+        String value = EnvFile.get(key);
         return value == null || value.isBlank() ? defaultValue : value;
     }
 }
