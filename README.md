@@ -15,6 +15,93 @@ Aplicação Java de **terminal** para gerenciar coletas com:
 
 Cases: Escola Mundo Dev — Módulo 2 + Modelos & Inference + Prompt Engineering + DevOps Fundamentals + Cloud para Backend + Design de Software Inter + Banco de Dados Inter + Data Engineering & Pipelines Basico + Pipelines Intermediario.
 
+## Um passeio pelo sistema
+
+O FilaFacil é o balcão de uma transportadora pequena, escrito em Java. Quem opera no dia a dia abre um menu no terminal: cadastra coleta, olha a fila, muda status, pede para uma IA classificar um recado e confere se um manifesto de carga está inteiro. Ao lado disso existe uma segunda porta, sem tela, só HTTP: a API de agendamento de docas. Os dois programas moram no mesmo repositório e sobem com comandos diferentes. Dá para estudar e demonstrar tudo sem cartão de crédito. O CEP usa a ViaCEP, que é pública. O banco pode ficar só na memória. A IA desta máquina aponta para a Groq, no plano gratuito, com modelos compatíveis com o protocolo da OpenAI.
+
+O arquivo `.env` na raiz (ele não vai para o Git) liga o modo HTTP da IA. Hoje ele está assim, sem a chave, que fica só na sua máquina:
+
+| Variável | Valor em uso |
+|----------|----------------|
+| `FILAFACIL_LLM_MODE` | `http` |
+| `FILAFACIL_LLM_BASE_URL` | `https://api.groq.com/openai/v1` |
+| `FILAFACIL_LLM_MODEL_LIGHT` | `openai/gpt-oss-20b` |
+| `FILAFACIL_LLM_MODEL_DETAILED` | `openai/gpt-oss-120b` |
+
+Quem sobe o menu com `mvn -q compile exec:java` vê na primeira linha `LLM mode: http` e os dois nomes de modelo. Se essas variáveis não existirem, o programa continua no mock: uma resposta local, sem rede, útil para os testes automáticos.
+
+Um detalhe que evita surpresa: só a camada de inferência lê o `.env`. A API, a auditoria e os pipelines ainda leem o ambiente do processo. Para um ensaio sem Docker, defina no PowerShell, antes do comando:
+
+```powershell
+$env:FILAFACIL_DB_URL = "memory"
+```
+
+Com isso o Postgres, o Redis e o Mongo não precisam estar ligados. Os dados de auditoria nascem de um seed equivalente ao SQL, e o pipeline grava CSV e JSON em `data/pipeline` em vez de tentar o banco.
+
+### O que aconteceu numa rodada real
+
+No dia 10 de novembro de 2026 o menu inteiro foi percorrido com a Groq de verdade, e a API foi exercitada à parte, em memória, na porta 8095 (a 8080 já estava ocupada nesta máquina). O `mvn test` continua verde e não gasta cota: o eval offline usa o gateway mock de propósito.
+
+**Cadastro.** A opção 1 pergunta nome, endereço, pacotes, prioridade e CEP. Ela só grava depois que a ViaCEP responde. Nesta rodada entrou a coleta da Maria Silva, dois pacotes, prioridade alta, CEP `01310100`. A ViaCEP devolveu Bela Vista, São Paulo, SP, e o registro ganhou o id 3, porque o arquivo `data/coletas.json` já tinha outras coletas. Listar mostrou a fila. Filtrar por status `pendente` devolveu quem ainda não tinha saído. Atualizar status leva um id e um dos valores `pendente`, `em_rota` ou `concluida`. O resumo, em seguida, contou 3 coletas e 7 pacotes, com a divisão por prioridade e por status. O arquivo local foi restaurado ao fim do ensaio, para a coleta de demonstração não ficar misturada com o que já estava salvo.
+
+**Triagem.** A opção 6 pede um texto e uma linha vazia para enviar. Uma frase curta, sem palavra de urgência, vai para o modelo leve. O texto usado foi: a coleta COL-10 da Maria está pendente e alguém quer confirmar o bairro. A primeira tentativa esbarrou num erro de certificado da JVM (`PKIX path building failed`), daqueles que aparecem quando um antivírus inspeciona HTTPS. O cliente tenta de novo. A segunda chamada voltou em cerca de 1 segundo, perfil LIGHT, modelo `openai/gpt-oss-20b`, sem fallback. O JSON passou no contrato: `consulta_entrega`, cliente Maria, código COL-10, sentimento neutro, prioridade sugerida média, intervenção humana falsa, confiança 0,9. As tools locais rodaram em seguida. Como COL-10 não existe no arquivo de coletas, o status da entrega veio `desconhecido` e a prioridade calculada pela tool ficou `baixa`. A IA sugere; o cadastro local é quem confirma o fato.
+
+Uma reclamação longa muda de modelo sozinha. O roteador olha o texto que realmente segue para o modelo (a frase mais o resumo da sessão, quando houver). Se passar de 280 caracteres, ou se aparecer algo como reclamação, “não chegou”, urgente, danificado ou Procon, o perfil vira DETAILED e o modelo é o `openai/gpt-oss-120b`. A frase “o pedido não chegou, o pacote veio danificado, o cliente quer o Procon” caiu nesse perfil e a Groq respondeu em cerca de 1,6 segundo. O JSON veio incompleto: faltou a chave `justificativaIntervencencao`. O validador recusou, o menu mostrou `ERRO [inference]` e continuou de pé, com o último erro visível no topo. Esse nome de campo, no contrato do projeto, está grafado com um “c” a mais. O modelo leve copiou a chave do prompt e passou. O modelo grande omitiu a chave e foi barrado. A tela não aceita uma resposta bonita que fuja do contrato.
+
+O número `costUsd~` no log é uma estimativa local (`FILAFACIL_LLM_PRICE_PER_1K`), para comparar perfil leve e detalhado. Não é a fatura da Groq. No plano gratuito a chamada entra na cota.
+
+**Atendimento.** A opção 7 é uma conversa, não um formulário cego. Se faltam código, cliente ou status, o programa pergunta uma coisa de cada vez e ainda não chama a IA. Foi o que aconteceu com “quero consultar uma entrega”: veio a pergunta do código, depois a do cliente, depois a do status. As respostas `coleta COL-99`, `cliente: Joao Lima` e `status pendente` preencheram a sessão. Só então a Groq foi chamada. Duas tentativas voltaram sem texto útil (`content` vazio, coisa que esses modelos às vezes fazem quando gastam a resposta em raciocínio interno). A terceira veio certa, no modelo leve, em menos de 1 segundo: consulta da COL-99, cliente Joao Lima, status pendente, próxima ação “confirmar status com o cliente”, `conclusaoPronta: true`.
+
+Quando a primeira frase já traz os três dados, a conversa não enrola. “Consulta da coleta COL-22. Cliente: Ana Souza. Status pendente. Ela quer saber se ja saiu.” foi direto ao modelo. O pacote da mensagem mais o resumo da sessão passou de 280 caracteres, então o perfil foi o detalhado. A conclusão estruturada saiu com código COL-22, cliente Ana Souza, status pendente e a próxima ação de responder se a coleta já saiu. O grounding aceitou, porque o status dito estava na própria frase. O programa se recusa a tratar como fato um status que ninguém escreveu.
+
+`/reset` limpa a sessão. `/fim` sai sem concluir.
+
+**Manifesto.** A opção 8 lê um JSON ou CSV e diz se a carga pode seguir. `data/manifestos/valido.json` fechou com 2 registros, 0 erros, status aprovado. `data/manifestos/invalido.json` fechou reprovado, 3 registros e 5 problemas: pacote PKG-100 duplicado, rota, veículo e responsável vazios nessa mesma linha, e status vazio no PKG-101. O mesmo julgamento existe sem menu, para o CI:
+
+```powershell
+mvn -q compile exec:java@manifest-cli "-Dexec.args=data/manifestos/valido.json"
+```
+
+**Auditoria.** A opção 10 abre um submenu em cima de um conjunto de entregas e reembolsos. No modo memória o seed traz 8 entregas e 4 reembolsos. A listagem pediu a página 1 com 5 itens e devolveu `Total=8`, `pagina=1/2`, `next=true`, da entrega 1 (Cliente Alpha, Motorista Ana, entregue) até a 5. Os joins contaram 8 linhas no INNER, 4 entregas sem ocorrência no LEFT, e no RIGHT o motorista “sem entregas” apareceu com zero. Aprovar o reembolso 1 mudou o status para `aprovado`. O resumo cacheado, na primeira leitura, veio da conta fresca (`fromCache=false`): 8 entregas, 1 pendente, 2 aprovados. A leitura seguinte, feita na hora, veio do cache (`fromCache=true`) com os mesmos números. O evento ficou registrado como `REEMBOLSO_APROVADO` no reembolso 1, usuário `terminal-local`.
+
+**Pipelines.** A opção 11 leu as fixtures (coletas, ocorrências, entregas e o cadastro de clientes), montou a camada bruta e a processada por data e id de execução, e gravou a consolidada em arquivo. O log desta rodada: 17 registros lidos, 3 descartados na transformação, 10 gravados, status SUCCESS. Ingestão levou 254 ms, transformação 6 ms, carga 4 ms. Como o banco estava em memória, a carga registrou `cadastroJdbc=false` e `db=fallback-arquivo-only`. A opção 12, no modo incremental, leu 4 fontes (5 entregas, 4 motoristas, 4 clientes, 4 coletas de API) e consolidou 13 inseridos, 3 atualizados, 1 deletado e 3 deduplicados, sem evento atrasado. O lineage ficou em `data/pipeline/lineage` e o estado consolidado em `data/pipeline/consolidada/inter/state.json`.
+
+**API de docas.** Ela sobe com `mvn -q compile exec:java@api`. Nesta prova a porta foi 8095 e o repositório era memória, então nada foi para Postgres nem para S3. O anexo foi para disco, no diretório `data/anexos-teste`.
+
+| Chamada | Resultado |
+|---------|-----------|
+| `GET /health` | `{"status":"ok"}` |
+| `POST /agendamentos` com TransLog, placa `abc1d23`, doca D1, `2026-11-12T10:00:00` | 201, id 1, placa normalizada para `ABC1D23`, status `agendado` |
+| Segundo POST, Rota Sul, doca D2, dia 13 | 201, id 2 |
+| `GET /agendamentos` | os dois registros |
+| `GET /agendamentos?data=2026-11-12` | só o id 1 |
+| `PATCH /agendamentos/1/status` com `em_atendimento` | 200, status atualizado |
+| `POST /agendamentos/1/anexo` com um arquivo | 200, `anexoRef` em `file://.../agendamentos/1/...` |
+| `POST /agendamentos/2/cancelar` | 200, status `cancelado` |
+| POST sem transportadora | 400, `{"tipo":"validacao","mensagem":"Campo obrigatorio ausente: transportadora"}` |
+
+O corpo guarda a referência do arquivo, não o arquivo em si. Em `FILAFACIL_API_MODE=prod` essa referência passaria a ser `s3://...`, e aí sim entra conta AWS. Para o uso local, o disco resolve.
+
+### Como repetir
+
+No terminal, com o `.env` já apontando para a Groq:
+
+```powershell
+$env:FILAFACIL_DB_URL = "memory"
+mvn -q compile exec:java
+```
+
+As opções 6 e 7 são as que falam com a IA. As outras funcionam mesmo se a chave estiver vazia. A API, noutro terminal:
+
+```powershell
+$env:FILAFACIL_DB_URL = "memory"
+mvn -q compile exec:java@api
+```
+
+Saúde em `http://localhost:8080/health`. Se a porta estiver ocupada, mude `FILAFACIL_API_PORT`.
+
+Para voltar ao Gemini, que também tem cota gratuita e fala o mesmo protocolo, troque no `.env` a chave, a URL `https://generativelanguage.googleapis.com/v1beta/openai` e os modelos `gemini-2.5-flash` (leve) e `gemini-2.5-pro` (detalhado). A chave da Groq e a do Gemini ficam só no `.env`. Como as duas já apareceram numa conversa, o caminho seguro é revogar as atuais nos painéis e colar chaves novas.
+
 ## Pré-requisitos
 
 - JDK 17+ (o Maven do ambiente tipicamente já usa 17)
