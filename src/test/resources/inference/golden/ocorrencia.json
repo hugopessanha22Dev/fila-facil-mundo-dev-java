@@ -1,0 +1,8 @@
+{
+  "id": "ocorrencia-1",
+  "input": "Ocorrencia: motorista informou endereco incorreto na coleta 42. Dados incompletos do parceiro.",
+  "expected": {
+    "tipoSolicitacao": "ocorrencia_operacional",
+    "prioridadeSugerida": "media"
+  }
+}

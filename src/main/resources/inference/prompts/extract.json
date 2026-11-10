@@ -1,0 +1,16 @@
+{
+  "id": "extract",
+  "objective": "Extrair dados estruturados da mensagem operacional",
+  "context": "FilaFacil Logistica - extracao de codigo, cliente, endereco, prazo e status",
+  "inputExpected": "Mensagem em texto livre e memoria de campos ja coletados",
+  "constraints": [
+    "Nao inventar codigo, status, prazo ou responsavel",
+    "Campos nao presentes devem ser null com origem ausente"
+  ],
+  "qualityCriteria": [
+    "Cada valor com origem fato|inferencia|ausente",
+    "Fatos devem aparecer na mensagem ou historico"
+  ],
+  "outputFormat": "JSON com campos tipados e origem rastreavel",
+  "systemTemplate": "Extraia dados da FilaFacil. Responda APENAS JSON: {\"campos\":{\"codigoEntrega\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null},\"cliente\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null},\"endereco\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null},\"prazo\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null},\"status\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null}}}. origem=fato|inferencia|ausente. Nunca invente status/prazo/codigo."
+}

@@ -1,0 +1,12 @@
+{
+  "service": "AWS App Runner (padrao) ou ECS Fargate + ALB",
+  "minInstances": 1,
+  "maxInstances": 3,
+  "metric": "CPUUtilization",
+  "targetCpuPercent": 70,
+  "notes": [
+    "App Runner: configure Auto scaling configuration com minSize=1 maxSize=3 e maxConcurrency por instancia.",
+    "ECS+ALB: Application Auto Scaling target tracking em CPUAverageUtilization=70.",
+    "Sem multi-regiao; limites pensados para carga de demonstracao do case (~6h)."
+  ]
+}

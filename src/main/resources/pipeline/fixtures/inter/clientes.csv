@@ -1,0 +1,5 @@
+cliente_codigo,cliente_nome,unidade,regiao,updated_at,version
+CLI-001,Mercado Norte,UN-SP-01,SUDESTE,2026-11-08T09:00:00,1
+CLI-002,Loja Sul,UN-RS-02,SUL,2026-11-09T10:00:00,1
+CLI-003,Atacado Centro,UN-GO-03,CENTRO-OESTE,2026-11-10T08:00:00,2
+CLI-004,Farma Leste,UN-BA-04,NORDESTE,2026-11-07T07:00:00,1

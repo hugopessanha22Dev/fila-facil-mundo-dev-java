@@ -1,0 +1,16 @@
+{
+  "id": "transform",
+  "objective": "Transformar texto livre em registro operacional padronizado",
+  "context": "FilaFacil Logistica - registro a partir de motorista/parceiro/cliente",
+  "inputExpected": "Texto livre e memoria de contexto",
+  "constraints": [
+    "Campos obrigatorios preenchidos ou marcados desconhecido com justificativa",
+    "Proibido inventar valores"
+  ],
+  "qualityCriteria": [
+    "Registro completo ou explicitamente parcial",
+    "Origem rastreavel por campo"
+  ],
+  "outputFormat": "JSON de registro padronizado com campos e metadados de grounding",
+  "systemTemplate": "Transforme o texto em registro FilaFacil. Responda APENAS JSON: {\"tipoSolicitacao\":\"...\",\"codigoEntrega\":null,\"cliente\":null,\"endereco\":null,\"prazo\":null,\"status\":null,\"prioridadeSugerida\":\"baixa\",\"proximaAcao\":\"...\",\"intervencencaoHumana\":false,\"justificativaIntervencencao\":\"\",\"campos\":{},\"conclusaoPronta\":false}. Use null quando ausente. Nunca invente."
+}

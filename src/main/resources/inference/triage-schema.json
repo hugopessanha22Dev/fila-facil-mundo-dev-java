@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://filafacil.local/schemas/triage-result.json",
+  "title": "TriageResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tipoSolicitacao",
+    "codigoColeta",
+    "cliente",
+    "sentimento",
+    "prioridadeSugerida",
+    "resumoOperacional",
+    "proximaAcao",
+    "intervencaoHumana",
+    "justificativaIntervencencao",
+    "nivelConfianca",
+    "camposAusentesOuErro",
+    "indicadoresFalha"
+  ],
+  "properties": {
+    "tipoSolicitacao": {
+      "type": "string",
+      "enum": ["consulta_entrega", "ocorrencia_operacional", "reclamacao_cliente"]
+    },
+    "codigoColeta": {
+      "type": ["string", "null"]
+    },
+    "cliente": {
+      "type": ["string", "null"]
+    },
+    "sentimento": {
+      "type": "string",
+      "enum": ["neutro", "ansioso", "insatisfeito", "urgente"]
+    },
+    "prioridadeSugerida": {
+      "type": "string",
+      "enum": ["baixa", "media", "alta"]
+    },
+    "resumoOperacional": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proximaAcao": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intervencaoHumana": {
+      "type": "boolean"
+    },
+    "justificativaIntervencencao": {
+      "type": "string"
+    },
+    "nivelConfianca": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "camposAusentesOuErro": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "indicadoresFalha": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "summarize",
+  "objective": "Sumarizar ocorrencia operacional com fidelidade aos fatos",
+  "context": "FilaFacil Logistica - resumo interno de casos",
+  "inputExpected": "Mensagem e/ou historico da sessao",
+  "constraints": [
+    "Sem inferencias nao sustentadas",
+    "Manter apenas fatos informados"
+  ],
+  "qualityCriteria": [
+    "Resumo fiel",
+    "JSON valido"
+  ],
+  "outputFormat": "JSON com resumoOperacional e fatos[]",
+  "systemTemplate": "Resuma a ocorrencia da FilaFacil sem inventar. Responda APENAS JSON: {\"resumoOperacional\":\"...\",\"fatos\":[\"...\"]}."
+}

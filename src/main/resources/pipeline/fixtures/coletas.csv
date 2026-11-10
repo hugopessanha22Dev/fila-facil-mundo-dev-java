@@ -1,0 +1,6 @@
+codigo_coleta,cliente,regiao,responsavel,status,prazo_previsto,prazo_realizado,data_operacao
+COL-100,CLI-001,sudeste,Ana,concluida,2026-11-08,2026-11-08,2026-11-08
+COL-101,CLI-002,sul,Bruno,concluida,2026-11-08,2026-11-09,2026-11-08
+COL-102,CLI-003,centro-oeste,Carla,em_rota,2026-11-09,,2026-11-09
+COL-103,CLI-999,nordeste,Diego,concluida,2026-11-09,2026-11-09,2026-11-09
+COL-104,,sudeste,Eva,pendente,2026-11-09,,2026-11-09

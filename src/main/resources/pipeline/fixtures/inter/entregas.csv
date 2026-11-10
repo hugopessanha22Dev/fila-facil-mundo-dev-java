@@ -1,0 +1,6 @@
+id_entrega,regiao,status_final,atraso,cliente,unidade,updated_at,version,deleted
+ENT-200,sudeste,concluida,false,CLI-001,UN-SP-01,2026-11-08T12:00:00,1,false
+ENT-201,sul,concluida,true,CLI-002,UN-RS-02,2026-11-09T13:00:00,1,false
+ENT-202,centro-oeste,concluida,false,CLI-003,UN-GO-03,2026-11-10T10:00:00,1,false
+ENT-201,sul,concluida,true,CLI-002,UN-RS-02,2026-11-09T14:00:00,2,false
+ENT-999,sudeste,cancelada,false,CLI-001,UN-SP-01,2026-11-10T11:00:00,1,true

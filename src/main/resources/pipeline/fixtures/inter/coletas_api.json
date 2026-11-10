@@ -1,0 +1,38 @@
+[
+  {
+    "codigo_coleta": "COL-100",
+    "cliente": "CLI-001",
+    "regiao": "sudeste",
+    "status": "concluida",
+    "updated_at": "2026-11-08T10:00:00",
+    "version": 1,
+    "deleted": false
+  },
+  {
+    "codigo_coleta": "COL-101",
+    "cliente": "CLI-002",
+    "regiao": "sul",
+    "status": "concluida",
+    "updated_at": "2026-11-09T11:00:00",
+    "version": 2,
+    "deleted": false
+  },
+  {
+    "codigo_coleta": "COL-105",
+    "cliente": "CLI-001",
+    "regiao": "sudeste",
+    "status": "em_rota",
+    "updated_at": "2026-11-10T09:00:00",
+    "version": 1,
+    "deleted": false
+  },
+  {
+    "codigo_coleta": "COL-100",
+    "cliente": "CLI-001",
+    "regiao": "sudeste",
+    "status": "concluida",
+    "updated_at": "2026-11-07T08:00:00",
+    "version": 0,
+    "deleted": false
+  }
+]

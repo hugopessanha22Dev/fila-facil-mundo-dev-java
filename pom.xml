@@ -8,12 +8,15 @@
     <artifactId>fila-facil</artifactId>
     <version>1.0.0</version>
     <name>FilaFacil Logistica</name>
-    <description>CRUD de coletas em terminal com persistencia em arquivo JSON local</description>
+    <description>FilaFacil terminal com JSON local, ViaCEP async, estado e testes</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>17</maven.compiler.release>
         <jackson.version>2.18.1</jackson.version>
+        <junit.version>5.11.3</junit.version>
+        <javalin.version>6.4.0</javalin.version>
+        <aws.sdk.version>2.29.45</aws.sdk.version>
     </properties>
 
     <dependencies>
@@ -21,6 +24,63 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin</artifactId>
+            <version>${javalin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>6.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>5.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>5.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.duckdb</groupId>
+            <artifactId>duckdb_jdbc</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin-testtools</artifactId>
+            <version>${javalin.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -31,8 +91,34 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>21</release>
+                    <release>17</release>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[17,)</version>
+                                    <message>Este projeto exige JDK 17+. Verifique JAVA_HOME (Maven esta usando uma versao abaixo de 17).</message>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -41,6 +127,32 @@
                 <configuration>
                     <mainClass>com.mundodev.filafacil.Main</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>manifest-cli</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.manifest.ManifestCli</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>offline-eval</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.inference.eval.OfflineEvalRunner</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>api</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.api.ApiMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pipeline</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.pipeline.PipelineCli</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

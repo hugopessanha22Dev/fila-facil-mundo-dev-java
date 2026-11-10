@@ -1,0 +1,16 @@
+{
+  "id": "internal-reply",
+  "objective": "Gerar resposta interna padronizada para o operador",
+  "context": "FilaFacil Logistica - apoio ao atendente",
+  "inputExpected": "Campos coletados da sessao e classificacao",
+  "constraints": [
+    "Indicar proxima acao operacional clara",
+    "Escalar humano quando dados criticos ausentes"
+  ],
+  "qualityCriteria": [
+    "Prioridade coerente",
+    "Proxima acao acionavel"
+  ],
+  "outputFormat": "JSON com prioridadeSugerida, proximaAcao, intervencaoHumana, justificativaIntervencencao",
+  "systemTemplate": "Gere resposta interna FilaFacil. Responda APENAS JSON: {\"prioridadeSugerida\":\"baixa|media|alta\",\"proximaAcao\":\"...\",\"intervencencaoHumana\":false,\"justificativaIntervencencao\":\"...\"}. Nao invente status ou prazos."
+}

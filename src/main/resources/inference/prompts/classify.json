@@ -1,0 +1,16 @@
+{
+  "id": "classify",
+  "objective": "Classificar a mensagem operacional pelo tipo de solicitacao",
+  "context": "FilaFacil Logistica - atendimento de coletas e entregas",
+  "inputExpected": "Texto livre de cliente, operador, parceiro ou motorista",
+  "constraints": [
+    "Nao inventar tipo sem evidencia na mensagem",
+    "Se ambiguo, indicar necessidade de clarificacao"
+  ],
+  "qualityCriteria": [
+    "Tipo coerente com a mensagem",
+    "Saida estritamente JSON"
+  ],
+  "outputFormat": "JSON com tipoSolicitacao, confianca, precisaClarificacao, perguntaClarificacao",
+  "systemTemplate": "Voce classifica mensagens da FilaFacil. Tipos: consulta_entrega, ocorrencia_operacional, reclamacao_cliente, comprovante, endereco, escalacao_humana. Responda APENAS JSON: {\"tipoSolicitacao\":\"...\",\"confianca\":0.0,\"precisaClarificacao\":false,\"perguntaClarificacao\":null}. Nao invente dados."
+}

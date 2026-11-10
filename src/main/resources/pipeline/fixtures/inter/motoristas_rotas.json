@@ -1,0 +1,38 @@
+[
+  {
+    "motorista_id": "MOT-01",
+    "nome": "Ana",
+    "rota": "R-SP-01",
+    "regiao": "sudeste",
+    "updated_at": "2026-11-08T15:00:00",
+    "version": 1,
+    "deleted": false
+  },
+  {
+    "motorista_id": "MOT-02",
+    "nome": "Bruno",
+    "rota": "R-RS-02",
+    "regiao": "sul",
+    "updated_at": "2026-11-09T16:00:00",
+    "version": 1,
+    "deleted": false
+  },
+  {
+    "motorista_id": "MOT-01",
+    "nome": "Ana Silva",
+    "rota": "R-SP-01",
+    "regiao": "sudeste",
+    "updated_at": "2026-11-10T08:30:00",
+    "version": 2,
+    "deleted": false
+  },
+  {
+    "motorista_id": "MOT-03",
+    "nome": "Carla",
+    "rota": "R-GO-03",
+    "regiao": "centro-oeste",
+    "updated_at": "2026-11-06T07:00:00",
+    "version": 1,
+    "deleted": false
+  }
+]

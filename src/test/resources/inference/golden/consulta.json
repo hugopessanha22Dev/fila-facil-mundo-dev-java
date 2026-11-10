@@ -1,0 +1,8 @@
+{
+  "id": "consulta-1",
+  "input": "Ola, onde esta a entrega do pedido: C-100? Cliente: Ana Silva",
+  "expected": {
+    "tipoSolicitacao": "consulta_entrega",
+    "prioridadeSugerida": "baixa"
+  }
+}

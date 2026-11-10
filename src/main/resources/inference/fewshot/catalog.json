@@ -1,0 +1,32 @@
+{
+  "examples": [
+    {
+      "id": "pos-consulta",
+      "type": "positivo",
+      "taskId": "classify",
+      "input": "Cliente: Ana Demo pergunta onde esta a entrega do pedido C-100.",
+      "output": "{\"tipoSolicitacao\":\"consulta_entrega\",\"confianca\":0.9,\"precisaClarificacao\":false,\"perguntaClarificacao\":null}"
+    },
+    {
+      "id": "neg-ambiguo",
+      "type": "negativo",
+      "taskId": "classify",
+      "input": "Preciso de ajuda com isso urgente.",
+      "output": "{\"tipoSolicitacao\":\"consulta_entrega\",\"confianca\":0.4,\"precisaClarificacao\":true,\"perguntaClarificacao\":\"Qual o codigo da entrega ou coleta?\"}"
+    },
+    {
+      "id": "contra-status",
+      "type": "contraexemplo",
+      "taskId": "extract",
+      "input": "O pacote ainda nao chegou.",
+      "output": "{\"campos\":{\"status\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null},\"codigoEntrega\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null}}}"
+    },
+    {
+      "id": "esc-humano",
+      "type": "escalacao",
+      "taskId": "internal-reply",
+      "input": "Cliente ameaca Procon e pede contato imediato sobre perda do pacote R-77.",
+      "output": "{\"prioridadeSugerida\":\"alta\",\"proximaAcao\":\"Encaminhar para atendimento humano\",\"intervencencaoHumana\":true,\"justificativaIntervencencao\":\"Escalacao com risco reputacional\"}"
+    }
+  ]
+}

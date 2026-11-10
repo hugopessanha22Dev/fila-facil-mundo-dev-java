@@ -1,0 +1,9 @@
+{
+  "id": "reclamacao-1",
+  "input": "Reclamacao urgente: a entrega nao chegou e o pacote parece perdido. Quero resolucao imediata. Coleta: R-77. Cliente: Bruno",
+  "expected": {
+    "tipoSolicitacao": "reclamacao_cliente",
+    "prioridadeSugerida": "alta",
+    "intervencaoHumana": true
+  }
+}

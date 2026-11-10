@@ -1,1 +1,10 @@
-{}
+{
+  "skillOverrides": {
+    "spring-data-jpa": "off"
+  },
+  "claudeSkillsTaskFocus": {
+    "disabledByTaskFocus": [
+      "spring-data-jpa"
+    ]
+  }
+}

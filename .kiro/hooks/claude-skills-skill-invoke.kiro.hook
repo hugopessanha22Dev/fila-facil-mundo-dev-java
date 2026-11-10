@@ -18,7 +18,7 @@
   },
   "then": {
     "type": "runCommand",
-    "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:4895/hook/skill-invoke?agent=kiro&cwd=c%3A%5CProjetos%5CMundoDev-Projetos%5Cfila-facil-mundo-dev-java\" || true",
+    "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:62075/hook/skill-invoke?agent=kiro&cwd=c%3A%5CProjetos%5CMundoDev-Projetos%5Cfila-facil-mundo-dev-java\" || true",
     "timeout": 8
   }
 }

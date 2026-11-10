@@ -6,6 +6,7 @@ target/
 .settings/
 *.log
 .DS_Store
+.env
 data/
 .claude/learning/
 .cursor/learning/

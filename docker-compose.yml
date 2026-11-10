@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: filafacil-postgres
+    environment:
+      POSTGRES_DB: filafacil
+      POSTGRES_USER: filafacil
+      POSTGRES_PASSWORD: filafacil
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./src/main/resources/api/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./src/main/resources/auditoria/02-auditoria-schema.sql:/docker-entrypoint-initdb.d/02-auditoria-schema.sql:ro
+      - ./src/main/resources/auditoria/03-auditoria-seed.sql:/docker-entrypoint-initdb.d/03-auditoria-seed.sql:ro
+      - ./src/main/resources/pipeline/04-pipeline-schema.sql:/docker-entrypoint-initdb.d/04-pipeline-schema.sql:ro
+      - ./src/main/resources/pipeline/05-pipeline-seed.sql:/docker-entrypoint-initdb.d/05-pipeline-seed.sql:ro
+      - ./src/main/resources/pipeline/06-pipeline-inter-schema.sql:/docker-entrypoint-initdb.d/06-pipeline-inter-schema.sql:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U filafacil -d filafacil"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: filafacil-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mongo:
+    image: mongo:7
+    container_name: filafacil-mongo
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
