@@ -1,9 +1,13 @@
 {
   "skillOverrides": {
-    "spring-data-jpa": "off"
+    "spring-data-jpa": "off",
+    "extension-value-audit": "off",
+    "github-actions-ci": "off"
   },
   "claudeSkillsTaskFocus": {
     "disabledByTaskFocus": [
+      "extension-value-audit",
+      "github-actions-ci",
       "spring-data-jpa"
     ]
   }

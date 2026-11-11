@@ -1,0 +1,20 @@
+{
+  "id": "politica-entregas",
+  "titulo": "Politica de entregas",
+  "tipo": "politica",
+  "dominio": "entregas",
+  "versao": "v1",
+  "dataAtualizacao": "2026-03-01",
+  "owner": "operacao",
+  "acesso": "publico",
+  "secoes": [
+    {
+      "nome": "prazo",
+      "texto": "A entrega ficticia tem prazo de 24 horas. entrega prazo entrega prazo."
+    },
+    {
+      "nome": "janela",
+      "texto": "A janela de entrega ficticia abre de manha. entrega janela entrega."
+    }
+  ]
+}

@@ -152,6 +152,24 @@
                             <mainClass>com.mundodev.filafacil.pipeline.PipelineCli</mainClass>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>cloud-ai</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.cloudai.CloudAiMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ai-delivery</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.aidevops.AiDeliveryMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>rag</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.rag.RagMain</mainClass>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

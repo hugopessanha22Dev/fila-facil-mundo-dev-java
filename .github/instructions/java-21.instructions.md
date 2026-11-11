@@ -3,7 +3,7 @@ name: "java-21"
 description: "Java 21 language and runtime patterns for modern, safe code.
 Trigger: When writing Java 21 code using records, sealed types, or virtual threads."
 applyTo: "**/*"
-deployedAt: "2026-11-10T20:28:57.006Z"
+deployedAt: "2026-11-11T18:14:45.507Z"
 ---
 
 # java-21

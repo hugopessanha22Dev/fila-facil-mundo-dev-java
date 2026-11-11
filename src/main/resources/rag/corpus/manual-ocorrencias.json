@@ -1,0 +1,16 @@
+{
+  "id": "manual-ocorrencias",
+  "titulo": "Manual de ocorrencias",
+  "tipo": "manual",
+  "dominio": "ocorrencias",
+  "versao": "v1",
+  "dataAtualizacao": "2026-03-01",
+  "owner": "operacao",
+  "acesso": "publico",
+  "secoes": [
+    {
+      "nome": "registro",
+      "texto": "A ocorrencia ficticia deve ser registrada no ato. ocorrencia ocorrencia registro."
+    }
+  ]
+}

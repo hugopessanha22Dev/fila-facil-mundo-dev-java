@@ -1,0 +1,9 @@
+{
+  "minValidJson": 1.0,
+  "minSchemaAdherence": 1.0,
+  "minAccuracy": 0.8,
+  "maxCostUsd": 1.0,
+  "maxLatencyMs": 5000,
+  "maxAccuracyDrop": 0.1,
+  "maxExtractionDrop": 0.1
+}

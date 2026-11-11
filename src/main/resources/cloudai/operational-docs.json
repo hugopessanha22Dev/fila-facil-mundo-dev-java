@@ -1,0 +1,22 @@
+[
+  {
+    "id": "doc-coleta",
+    "familia": "regras_de_coleta",
+    "texto": "Regra de coleta: conferir CEP, quantidade de pacotes e prioridade antes de sair do hub."
+  },
+  {
+    "id": "doc-entrega",
+    "familia": "politica_de_entrega",
+    "texto": "Politica de entrega: atraso acima de um dia abre ocorrencia e oferece novo prazo ao cliente."
+  },
+  {
+    "id": "doc-ocorrencia",
+    "familia": "tipos_de_ocorrencia",
+    "texto": "Tipos de ocorrencia: atraso, avaria, extravio e endereco incorreto."
+  },
+  {
+    "id": "doc-instrucao",
+    "familia": "instrucoes_operacionais",
+    "texto": "Instrucao operacional: o operador confirma a doca e registra o status da coleta."
+  }
+]

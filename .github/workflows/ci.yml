@@ -24,6 +24,9 @@ jobs:
       - name: Run unit tests
         run: mvn -B test
 
+      - name: Avaliacao offline da esteira de IA
+        run: mvn -q exec:java@ai-delivery -Dexec.args=evaluate
+
       - name: Smoke ManifestCli (fixture valido)
         run: mvn -q exec:java@manifest-cli -Dexec.args=data/manifestos/valido.json
 

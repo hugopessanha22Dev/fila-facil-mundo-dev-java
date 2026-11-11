@@ -1,0 +1,52 @@
+{
+  "provider": "aws",
+  "note": "Mapa para demonstracao. A execucao local gratuita nao provisiona estes recursos.",
+  "resources": [
+    {
+      "type": "sqs",
+      "name": "filafacil-ai-triage",
+      "Environment": "dev",
+      "Owner": "filafacil",
+      "Purpose": "fila-triagem"
+    },
+    {
+      "type": "lambda",
+      "name": "filafacil-ai-functions",
+      "actions": ["validate-payload", "clean-prompt", "normalize-response"],
+      "Environment": "dev",
+      "Owner": "filafacil",
+      "Purpose": "serverless-triagem"
+    },
+    {
+      "type": "alb",
+      "name": "filafacil-ai-alb",
+      "Environment": "dev",
+      "Owner": "filafacil",
+      "Purpose": "entrada-assistente"
+    },
+    {
+      "type": "apprunner",
+      "name": "filafacil-ai-compute",
+      "minInstances": 1,
+      "maxInstances": 3,
+      "Environment": "dev",
+      "Owner": "filafacil",
+      "Purpose": "compute-continuo"
+    },
+    {
+      "type": "s3",
+      "name": "filafacil-ai-artifacts",
+      "prefixes": ["datasets/", "embeddings/", "prompts/", "evals/", "inferences/", "logs/"],
+      "Environment": "dev",
+      "Owner": "filafacil",
+      "Purpose": "artefatos-ia"
+    },
+    {
+      "type": "secretsmanager",
+      "name": "filafacil/ai/dev",
+      "Environment": "dev",
+      "Owner": "filafacil",
+      "Purpose": "chave-modelo"
+    }
+  ]
+}

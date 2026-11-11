@@ -1,0 +1,16 @@
+{
+  "id": "politica-coletas",
+  "titulo": "Politica de coletas",
+  "tipo": "politica",
+  "dominio": "coletas",
+  "versao": "v1",
+  "dataAtualizacao": "2026-03-01",
+  "owner": "operacao",
+  "acesso": "publico",
+  "secoes": [
+    {
+      "nome": "janela",
+      "texto": "A coleta ficticia abre janela de 2 horas. coleta coleta coleta janela."
+    }
+  ]
+}

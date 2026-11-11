@@ -1,0 +1,16 @@
+{
+  "id": "regras-comprovantes",
+  "titulo": "Regras de comprovantes",
+  "tipo": "regra",
+  "dominio": "comprovantes",
+  "versao": "v1",
+  "dataAtualizacao": "2026-03-01",
+  "owner": "operacao",
+  "acesso": "publico",
+  "secoes": [
+    {
+      "nome": "prazo",
+      "texto": "O prazo do comprovante digital ficticio e de 48 horas. comprovante digital prazo comprovante digital prazo."
+    }
+  ]
+}

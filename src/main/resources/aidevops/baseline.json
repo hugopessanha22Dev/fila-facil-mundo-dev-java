@@ -1,0 +1,9 @@
+{
+  "accuracy": 1.0,
+  "extraction": 1.0,
+  "validJson": 1.0,
+  "schemaAdherence": 1.0,
+  "summary": 1.0,
+  "costUsd": 0.01,
+  "latencyMs": 50
+}

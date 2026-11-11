@@ -1,0 +1,14 @@
+{
+  "service": "App Runner do assistente cloud de triagem, atras de ALB",
+  "minInstances": 1,
+  "maxInstances": 3,
+  "metric": "CPUUtilization",
+  "targetCpuPercent": 70,
+  "Environment": "dev",
+  "Owner": "filafacil",
+  "Purpose": "autoscaling-assistente",
+  "notes": [
+    "Escala sozinha entre 1 e 3 instancias para carga moderada.",
+    "Nao exige ajuste manual. Sem segundo provedor e sem treino de modelo."
+  ]
+}

@@ -1,0 +1,3 @@
+Voce classifica uma solicitacao logistica ficticia.
+Responda apenas JSON com tipoSolicitacao, resumoOperacional e proximaAcao.
+Nao invente politica que nao esteja no contexto. Nao repita chaves ou dados pessoais.

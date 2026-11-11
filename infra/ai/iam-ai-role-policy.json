@@ -1,0 +1,36 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadAiSecretForEnv",
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:filafacil/ai/ENV_NAME-*"
+    },
+    {
+      "Sid": "AiArtifactPrefix",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject"],
+      "Resource": [
+        "arn:aws:s3:::FILAFACIL_AI_BUCKET/ENV_NAME/datasets/*",
+        "arn:aws:s3:::FILAFACIL_AI_BUCKET/ENV_NAME/embeddings/*",
+        "arn:aws:s3:::FILAFACIL_AI_BUCKET/ENV_NAME/prompts/*",
+        "arn:aws:s3:::FILAFACIL_AI_BUCKET/ENV_NAME/evals/*",
+        "arn:aws:s3:::FILAFACIL_AI_BUCKET/ENV_NAME/inferences/*",
+        "arn:aws:s3:::FILAFACIL_AI_BUCKET/ENV_NAME/logs/*"
+      ]
+    },
+    {
+      "Sid": "AiQueue",
+      "Effect": "Allow",
+      "Action": ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
+      "Resource": "arn:aws:sqs:REGION:ACCOUNT_ID:filafacil-ai-triage-ENV_NAME"
+    },
+    {
+      "Sid": "AiLogs",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:REGION:ACCOUNT_ID:log-group:/filafacil/ai/ENV_NAME:*"
+    }
+  ]
+}

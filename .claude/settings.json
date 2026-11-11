@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:62075/hook/cli-loop-guard?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
+            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:4895/hook/cli-loop-guard?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
             "timeout": 8
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:62075/hook/dir-cache-guard?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
+            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:4895/hook/dir-cache-guard?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
             "timeout": 8
           }
         ]
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:62075/hook/prompt-context?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
+            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:4895/hook/prompt-context?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
             "timeout": 8
           }
         ]
@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:62075/hook/budget?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
+            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:4895/hook/budget?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
             "timeout": 8
           }
         ]
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:62075/hook/task-drift?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
+            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:4895/hook/task-drift?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
             "timeout": 8
           }
         ]
@@ -62,7 +62,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:62075/hook/session-stop?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
+            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:4895/hook/session-stop?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
             "timeout": 10
           }
         ]

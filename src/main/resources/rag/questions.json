@@ -1,0 +1,26 @@
+[
+  {
+    "id": "q-comprovante",
+    "text": "qual o prazo do comprovante digital",
+    "expectedDoc": "regras-comprovantes",
+    "expectedVersion": "v1",
+    "expectedSection": "prazo",
+    "absent": false
+  },
+  {
+    "id": "q-entrega",
+    "text": "qual o prazo da entrega",
+    "expectedDoc": "politica-entregas",
+    "expectedVersion": "v1",
+    "expectedSection": "prazo",
+    "absent": false
+  },
+  {
+    "id": "q-ausente",
+    "text": "qual o desconto de combustivel da frota zzinexistente",
+    "expectedDoc": "",
+    "expectedVersion": "",
+    "expectedSection": "",
+    "absent": true
+  }
+]

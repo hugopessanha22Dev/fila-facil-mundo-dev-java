@@ -1,0 +1,21 @@
+{
+  "version": "v1",
+  "dev": {
+    "primaryModel": "mock-light",
+    "fallbackModel": "mock-detailed",
+    "maxRetries": 2,
+    "rateLimitPerMinute": 60
+  },
+  "homolog": {
+    "primaryModel": "mock-light",
+    "fallbackModel": "mock-detailed",
+    "maxRetries": 2,
+    "rateLimitPerMinute": 20
+  },
+  "prod": {
+    "primaryModel": "mock-light",
+    "fallbackModel": "mock-detailed",
+    "maxRetries": 1,
+    "rateLimitPerMinute": 10
+  }
+}

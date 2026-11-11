@@ -1,0 +1,16 @@
+{
+  "id": "instrucoes-parceiros",
+  "titulo": "Instrucoes para parceiros",
+  "tipo": "instrucao",
+  "dominio": "parceiros",
+  "versao": "v1",
+  "dataAtualizacao": "2026-03-01",
+  "owner": "operacao",
+  "acesso": "parceiro",
+  "secoes": [
+    {
+      "nome": "handoff",
+      "texto": "O parceiro ficticio confirma o handoff no ponto de troca. parceiro parceiro handoff."
+    }
+  ]
+}

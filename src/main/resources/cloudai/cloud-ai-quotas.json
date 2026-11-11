@@ -1,0 +1,29 @@
+{
+  "dev": {
+    "timeoutSeconds": 45,
+    "maxTokens": 600,
+    "rateLimitPerMinute": 60,
+    "tokenQuota": 100000,
+    "alertTokenThreshold": 80000,
+    "cacheTtlSeconds": 120,
+    "maxAttempts": 2
+  },
+  "homolog": {
+    "timeoutSeconds": 30,
+    "maxTokens": 400,
+    "rateLimitPerMinute": 20,
+    "tokenQuota": 20000,
+    "alertTokenThreshold": 15000,
+    "cacheTtlSeconds": 60,
+    "maxAttempts": 2
+  },
+  "prod": {
+    "timeoutSeconds": 20,
+    "maxTokens": 300,
+    "rateLimitPerMinute": 10,
+    "tokenQuota": 5000,
+    "alertTokenThreshold": 4000,
+    "cacheTtlSeconds": 30,
+    "maxAttempts": 1
+  }
+}

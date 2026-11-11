@@ -1,0 +1,5 @@
+Classifique a mensagem operacional ficticia da FilaFacil.
+Responda somente um objeto JSON com os campos tipoSolicitacao, resumo, proximaAcao e prioridade.
+tipoSolicitacao aceita consulta_entrega, ocorrencia_operacional ou reclamacao_cliente.
+prioridade aceita baixa, media ou alta.
+Nao inclua chave, credencial ou dado real de cliente.

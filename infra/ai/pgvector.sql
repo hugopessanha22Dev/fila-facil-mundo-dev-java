@@ -1,0 +1,10 @@
+-- Alvo no Postgres local ja usado pelo projeto. A execucao padrao usa indice em arquivo, sem servico pago.
+-- CREATE EXTENSION IF NOT EXISTS vector;
+-- CREATE TABLE ai_embedding (
+--   environment text NOT NULL,
+--   domain text NOT NULL,
+--   version text NOT NULL,
+--   document_id text NOT NULL,
+--   family text NOT NULL,
+--   embedding vector(64) NOT NULL
+-- );

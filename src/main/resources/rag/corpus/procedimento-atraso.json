@@ -1,0 +1,16 @@
+{
+  "id": "procedimento-atraso",
+  "titulo": "Procedimento de atraso",
+  "tipo": "procedimento",
+  "dominio": "atraso",
+  "versao": "v1",
+  "dataAtualizacao": "2026-03-01",
+  "owner": "operacao",
+  "acesso": "publico",
+  "secoes": [
+    {
+      "nome": "aviso",
+      "texto": "O atraso ficticio exige aviso em ate 30 minutos. atraso atraso aviso."
+    }
+  ]
+}

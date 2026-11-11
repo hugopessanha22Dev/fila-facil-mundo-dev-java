@@ -1,0 +1,7 @@
+{
+  "id": "reclamacao-1",
+  "category": "reclamacao",
+  "message": "Reclamacao do cliente Carla Dias porque a coleta COL-30 nao chegou",
+  "expectedTipo": "reclamacao_cliente",
+  "expectedPrioridade": "alta"
+}

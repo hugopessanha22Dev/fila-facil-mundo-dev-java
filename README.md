@@ -102,6 +102,90 @@ Saúde em `http://localhost:8080/health`. Se a porta estiver ocupada, mude `FILA
 
 Para voltar ao Gemini, que também tem cota gratuita e fala o mesmo protocolo, troque no `.env` a chave, a URL `https://generativelanguage.googleapis.com/v1beta/openai` e os modelos `gemini-2.5-flash` (leve) e `gemini-2.5-pro` (detalhado). A chave da Groq e a do Gemini ficam só no `.env`. Como as duas já apareceram numa conversa, o caminho seguro é revogar as atuais nos painéis e colar chaves novas.
 
+## Assistente Cloud de Triagem
+
+Este é o módulo de Cloud for AI. Ele não treina modelo, não faz fine-tuning, não usa dado real de cliente e não abre um segundo provedor. O padrão é gratuito: fila em arquivo, embeddings no disco, cache em memória e gateway mock, sem conta AWS.
+
+Três ambientes, cada um com a própria chave e a própria quota. Desenvolvimento lê `FILAFACIL_LLM_API_KEY`. Homologação lê `FILAFACIL_LLM_API_KEY_HOMOLOG`. Produção lê `FILAFACIL_LLM_API_KEY_PROD` e recusa subir se a chave estiver vazia ou for um arquivo de dentro do repositório. Homologação e produção não herdam a chave de desenvolvimento. Os tetos estão em `src/main/resources/cloudai/cloud-ai-quotas.json`: produção é mais curta em timeout, tokens, chamadas por minuto e tentativas.
+
+O fluxo cabe em dois comandos:
+
+```powershell
+mvn -q compile exec:java@cloud-ai "-Dexec.args=enqueue --text consulta-de-coleta --origin cliente"
+mvn -q compile exec:java@cloud-ai "-Dexec.args=drain"
+```
+
+`enqueue` devolve um id e deixa a mensagem aceita. `drain` valida o payload numa função à parte, busca um dos quatro documentos fictícios (regras de coleta, política de entrega, tipos de ocorrência, instruções operacionais), chama o modelo só se o cache e o limite permitirem, e imprime tokens, chamadas, latência, erros, bytes de storage, profundidade da fila e custo. Se o texto vier vazio, a solicitação é rejeitada e o modelo não é chamado.
+
+Os artefatos ficam em `data/cloud-ai/{env}/`:
+
+| Pasta | Conteúdo |
+|-------|----------|
+| `datasets/raw` e `datasets/processed` | documentos brutos e tratados, por domínio |
+| `embeddings/operacao/v1` | vetores da versão ativa; a versão anterior continua no disco |
+| `prompts/triage-cloud` | prompt versionado; a versão já gravada não é reescrita |
+| `evals/{modelo}/{data}/triagem` | artefato da avaliação |
+| `inferences/{data}` | id, modelo, versão do prompt, latência, tokens, custo, status e erro |
+| `queue` | estados aceita, em processamento, concluída, rejeitada e falha |
+
+Chaves no formato `gsk_`, `sk-` e `AQ.` são mascaradas antes de ir para prompt, log ou resultado.
+
+Para usar a Groq gratuita de verdade, no mesmo `.env` da triagem local:
+
+```powershell
+$env:FILAFACIL_AI_GATEWAY = "http"
+$env:FILAFACIL_AI_ENV = "dev"
+```
+
+A URL padrão desse modo é `https://api.groq.com/openai/v1`, com `openai/gpt-oss-20b` e `openai/gpt-oss-120b`. Se a URL for `api.openai.com`, o programa recusa o provedor pago e volta para o mock. Cache em Redis local, se você quiser, é `FILAFACIL_AI_CACHE=redis` com o Redis do `docker compose`. Sem isso, o cache fica na memória.
+
+O mapa AWS, só documentação, está em `infra/ai/`: fila, Lambda das três funções, balanceador, App Runner com mínimo 1 e máximo 3, segredo por ambiente e IAM sem permissão de administrador. Cada recurso precisa das tags `Environment`, `Owner` e `Purpose`. O menu do terminal continua nas opções 0 a 12.
+
+## Esteira DevOps for AI
+
+A esteira decide se uma combinação de prompt, golden dataset, embedding, schema e configuração de modelo pode ir para homologação ou produção simulada. O padrão é gratuito: o comando usa o gateway mock, o CI não recebe chave e um pedido de URL `api.openai.com` é ignorado.
+
+```powershell
+mvn -q compile exec:java@ai-delivery "-Dexec.args=evaluate"
+mvn -q compile exec:java@ai-delivery "-Dexec.args=promote homolog"
+mvn -q compile exec:java@ai-delivery "-Dexec.args=rollback homolog"
+mvn -q compile exec:java@ai-delivery "-Dexec.args=status"
+```
+
+`evaluate` percorre prompt, casos do golden, schema, métricas e regressão. O relatório traz acurácia, extração, JSON válido, schema, resumo, custo, latência, regressão e falhas por categoria. A promoção só acontece com essa avaliação aprovada para a mesma combinação. `rollback` devolve a combinação que estava ativa antes.
+
+O que barra a release:
+
+| Gate | Efeito |
+|------|--------|
+| Prompt sem os campos do schema, ou com segredo | a esteira para antes do modelo |
+| Texto vazio | o caso é falha de entrada e o modelo não é chamado |
+| Texto livre ou JSON fora de `tipoSolicitacao`, `resumo`, `proximaAcao` e `prioridade` | a saída é recusada; há retry até o teto do ambiente, um fallback e, se os dois falharem, intervenção humana |
+| Acurácia, JSON válido ou schema abaixo do mínimo | avaliação reprovada e sem pacote |
+| Queda de acurácia ou de extração acima do limite, contra `baseline.json` | regressão reprovada |
+| Custo ou latência acima do teto absoluto | avaliação reprovada |
+| Latência do mock acima da linha de base, ainda abaixo do teto | não reprova sozinha |
+
+Produção simulada tem menos retries e um rate limit menor ou igual ao de desenvolvimento. As chaves não ficam nos JSON de `src/main/resources/aidevops/`. O ponteiro ativo fica em `data/ai-delivery/{homolog|prod}/active.json`. O golden novo fica em `aidevops/golden/` e não entra na pasta dos 3 casos do eval antigo.
+
+No GitHub Actions o passo `evaluate` roda depois de `mvn test`. Exit code diferente de zero reprova o job. O smoke do manifesto e o zip de release continuam no workflow.
+
+## Assistente RAG
+
+O assistente de Memory & Retrieval responde com trecho citado da base operacional. O embedding é o `TokenEmbedder` local, em arquivo, sem API e sem banco vetorial na nuvem. O menu do terminal continua nas opções 0 a 12.
+
+A base fictícia fica em `src/main/resources/rag/corpus/`: política de coletas, política de entregas, manual de ocorrências, FAQ de atendimento, regras de comprovantes, procedimento de atraso e instruções para parceiros. Cada documento tem título, tipo, domínio, versão, data, owner e nível de acesso. Publicar outra versão troca só os chunks daquele documento.
+
+```powershell
+mvn -q compile exec:java@rag "-Dexec.args=ingest"
+mvn -q compile exec:java@rag "-Dexec.args=ask --session op-1 --role operador --text prazo do comprovante digital"
+mvn -q compile exec:java@rag "-Dexec.args=eval"
+```
+
+A resposta separa `evidencia` e `orientacao` e cita documento, versão e seção. Se nenhum chunk passa no corte, a saída é `Nao encontrado nos documentos.` Parceiro não vê documento de operador. A memória da sessão guarda resumo, último domínio e fatos, expira pelo TTL e não vira regra: cada sessão tem o próprio arquivo em `data/rag/sessions/`.
+
+`eval` mede precision, recall, relevância, cobertura, groundedness e a taxa de respostas sem evidência. O relatório também aponta falha de documento desatualizado, chunk pequeno demais e filtro incorreto. As perguntas ficam em `rag/questions.json`, fora dos 3 casos do eval antigo.
+
 ## Pré-requisitos
 
 - JDK 17+ (o Maven do ambiente tipicamente já usa 17)

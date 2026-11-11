@@ -1,0 +1,9 @@
+{
+  "chunkSize": 240,
+  "overlap": 40,
+  "topK": 3,
+  "hybridWeight": 0.35,
+  "rerank": true,
+  "sessionTtlMinutes": 30,
+  "cutoff": 0.4
+}

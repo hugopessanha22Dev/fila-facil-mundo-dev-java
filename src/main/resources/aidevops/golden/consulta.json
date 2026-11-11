@@ -1,0 +1,7 @@
+{
+  "id": "consulta-1",
+  "category": "consulta",
+  "message": "Onde esta a coleta COL-10 do cliente Ana Lima?",
+  "expectedTipo": "consulta_entrega",
+  "expectedPrioridade": "baixa"
+}

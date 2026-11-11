@@ -1,0 +1,7 @@
+{
+  "id": "ocorrencia-1",
+  "category": "ocorrencia",
+  "message": "Registrar ocorrencia de atraso da coleta COL-20 cliente Bruno Souza",
+  "expectedTipo": "ocorrencia_operacional",
+  "expectedPrioridade": "media"
+}

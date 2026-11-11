@@ -1,0 +1,16 @@
+{
+  "id": "faq-atendimento",
+  "titulo": "FAQ de atendimento",
+  "tipo": "faq",
+  "dominio": "atendimento",
+  "versao": "v1",
+  "dataAtualizacao": "2026-03-01",
+  "owner": "operacao",
+  "acesso": "operador",
+  "secoes": [
+    {
+      "nome": "escalonamento",
+      "texto": "FAQ interno do operador: escalar reclamacao para o supervisor ficticio. atendimento operador."
+    }
+  ]
+}

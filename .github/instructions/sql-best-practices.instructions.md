@@ -2,7 +2,7 @@
 name: "sql-best-practices"
 description: "SQL development best practices for writing efficient, secure, and maintainable database queries"
 applyTo: "**/*"
-deployedAt: "2026-11-10T20:28:57.012Z"
+deployedAt: "2026-11-11T18:14:45.513Z"
 ---
 
 # sql-best-practices
