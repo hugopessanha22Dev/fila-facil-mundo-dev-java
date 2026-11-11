@@ -1,0 +1,5 @@
+{
+  "maxSteps": 8,
+  "maxAttemptsPerTool": 2,
+  "maxCalls": 8
+}

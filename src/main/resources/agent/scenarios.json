@@ -1,0 +1,65 @@
+[
+  {
+    "id": "sucesso",
+    "texto": "cliente pergunta status da entrega atrasada codigo ENT-100",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "resolvido"
+  },
+  {
+    "id": "codigo-inexistente",
+    "texto": "status da entrega atrasada codigo ENT-999",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "nao_encontrado"
+  },
+  {
+    "id": "ambiguo",
+    "texto": "atualizacao incompleta e ambigua do parceiro sem detalhe",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "escalado"
+  },
+  {
+    "id": "consulta-indisponivel",
+    "texto": "status da entrega atrasada codigo ENT-100",
+    "consultaIndisponivel": true,
+    "erroEscrita": false,
+    "parada": "ferramenta_indisponivel"
+  },
+  {
+    "id": "erro-registro",
+    "texto": "registrar ocorrencia de endereco incorreto codigo ENT-200 tipo endereco descricao rua sem numero",
+    "consultaIndisponivel": false,
+    "erroEscrita": true,
+    "parada": "falha_ferramenta"
+  },
+  {
+    "id": "critico",
+    "texto": "ocorrencia critica com risco operacional codigo ENT-100",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "escalado"
+  },
+  {
+    "id": "fora-escopo",
+    "texto": "qual a previsao do tempo amanha",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "fora_dominio"
+  },
+  {
+    "id": "loop",
+    "texto": "repetir consulta da entrega codigo ENT-100",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "loop"
+  },
+  {
+    "id": "sem-dados-minimos",
+    "texto": "registrar ocorrencia codigo ENT-200 tipo endereco",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "argumento_invalido"
+  }
+]

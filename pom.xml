@@ -170,6 +170,12 @@
                             <mainClass>com.mundodev.filafacil.rag.RagMain</mainClass>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>agent</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.agent.AgentMain</mainClass>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

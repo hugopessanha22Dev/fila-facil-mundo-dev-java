@@ -186,6 +186,35 @@ A resposta separa `evidencia` e `orientacao` e cita documento, versão e seção
 
 `eval` mede precision, recall, relevância, cobertura, groundedness e a taxa de respostas sem evidência. O relatório também aponta falha de documento desatualizado, chunk pequeno demais e filtro incorreto. As perguntas ficam em `rag/questions.json`, fora dos 3 casos do eval antigo.
 
+## Agente operacional
+
+O agente trata atraso, endereço incorreto, falha de coleta e ocorrência crítica. O plano de cada passo é local: uma ferramenta por vez, sem chamada paga de modelo. O menu do terminal continua nas opções 0 a 12.
+
+Ferramentas permitidas: `consultar_coleta`, `buscar_cliente`, `registrar_ocorrencia`, `consultar_regras`, `notificar`, `calcular_prioridade` e `escalar_humano`. Consulta, prioridade, ocorrência e escala reusam o mock de triagem quando o código é numérico. A regra vem da base RAG já indexada. Cliente, ocorrência e notificação ficam numa simulação em memória e não gravam `data/coletas.json`.
+
+```powershell
+mvn -q compile exec:java@agent "-Dexec.args=run --text status da entrega atrasada codigo ENT-100"
+mvn -q compile exec:java@agent "-Dexec.args=eval"
+```
+
+Paradas:
+
+| Parada | Significado |
+| --- | --- |
+| `resolvido` | O caso fechou com status, ações e próxima etapa |
+| `dado_ausente` | Faltou código e nada sensível foi executado |
+| `nao_encontrado` | O código não existe e o status não foi inventado |
+| `escalado` | Ambiguidade ou risco foi para atendimento humano |
+| `fora_dominio` | O pedido não é logístico e nenhuma ferramenta rodou |
+| `fora_escopo` | A ferramenta não está na lista permitida |
+| `limite` | Estourou o teto de passos ou de chamadas |
+| `loop` | O mesmo passo com os mesmos argumentos foi interrompido |
+| `ferramenta_indisponivel` | A consulta falhou até o teto de tentativas |
+| `falha_ferramenta` | A escrita da ocorrência falhou até o teto |
+| `argumento_invalido` | Registro ou notificação sem o dado mínimo |
+
+Ação sensível só grava depois de o schema passar. O trace marca `confirmado` e, em seguida, `gravado`. `eval` mede sucesso, custo estimado, latência, passos, ferramentas, falhas, escalonamentos e aderência. Sai com código 0 só quando os nove cenários de `agent/scenarios.json` batem a parada esperada. Esses cenários ficam fora dos 3 casos do eval antigo.
+
 ## Pré-requisitos
 
 - JDK 17+ (o Maven do ambiente tipicamente já usa 17)
