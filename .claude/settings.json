@@ -74,7 +74,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:62075/hook/official-skills?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
+            "command": "curl -sf -X POST -H \"Content-Type: application/json\" --data @- \"http://127.0.0.1:4895/hook/official-skills?agent=claude&cwd=${CLAUDE_PROJECT_DIR}\" || true",
             "timeout": 20
           }
         ]

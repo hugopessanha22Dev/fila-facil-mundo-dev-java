@@ -215,6 +215,18 @@ Paradas:
 
 Ação sensível só grava depois de o schema passar. O trace marca `confirmado` e, em seguida, `gravado`. `eval` mede sucesso, custo estimado, latência, passos, ferramentas, falhas, escalonamentos e aderência. Sai com código 0 só quando os nove cenários de `agent/scenarios.json` batem a parada esperada. Esses cenários ficam fora dos 3 casos do eval antigo.
 
+## Orquestrador de exceções
+
+O orquestrador trata exceção de entrega num domínio isolado: abrir, analisar, escalar, resolver, cancelar e consultar. O estado vive em memória e acaba quando o processo termina. O menu do terminal continua nas opções 0 a 12. Nada disso grava `data/coletas.json`.
+
+Status: `aberta`, `em_analise`, `escalada`, `resolvida` e `cancelada`. Severidade alta ou crítica precisa escalar antes de resolver. A resolução também precisa ocorrer dentro da janela informada na abertura.
+
+```powershell
+mvn -q compile exec:java@excecoes "-Dexec.args=abrir --entrega ENT-1 --tipo cliente_ausente --origem atendimento --severidade critica --descricao ausente --janela 2026-11-12T23:00:00Z"
+```
+
+O mapa dos contextos e a decisão de desenho estão em `docs/excecoes/`. Termos de roteirização, atendimento e financeiro passam pelo gateway antes de virar tipo e origem.
+
 ## Pré-requisitos
 
 - JDK 17+ (o Maven do ambiente tipicamente já usa 17)

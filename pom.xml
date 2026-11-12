@@ -176,6 +176,12 @@
                             <mainClass>com.mundodev.filafacil.agent.AgentMain</mainClass>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>excecoes</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.excecoes.adapters.ExcecoesMain</mainClass>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
