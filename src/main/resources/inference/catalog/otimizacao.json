@@ -1,0 +1,28 @@
+{
+  "estrategias": [
+    {
+      "id": "batching",
+      "uso": "agrupar classificacoes compativeis na mesma chamada",
+      "proibicao": "nao misturar tarefa, risco ou formato diferente",
+      "risco": "uma falha atrasa o lote inteiro"
+    },
+    {
+      "id": "cache",
+      "uso": "repetir classificacao do mesmo texto",
+      "proibicao": "nao cachear busca contextual nem contexto dinamico",
+      "risco": "devolver resposta velha se o sentido mudar"
+    },
+    {
+      "id": "compressao",
+      "uso": "colapsar espaco repetido sem apagar instrucao",
+      "proibicao": "nao remover instrucao essencial",
+      "risco": "perder a separacao entre trechos"
+    },
+    {
+      "id": "poda",
+      "uso": "cortar o miolo do contexto longo",
+      "proibicao": "nao remover evidencia critica",
+      "risco": "perder detalhe que estava no meio"
+    }
+  ]
+}

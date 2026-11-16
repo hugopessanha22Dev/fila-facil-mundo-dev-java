@@ -29,10 +29,11 @@ class RagTest {
     Path temp;
 
     @Test
-    void corpusTemSeteFamiliasERejeitaDesconhecida() {
+    void corpusTemOitoFamiliasERejeitaDesconhecida() {
         Set<String> dominios = catalog.load().stream().map(SourceDocument::dominio).collect(Collectors.toSet());
         assertEquals(CorpusCatalog.DOMINIOS, dominios);
-        assertEquals(7, catalog.load().size());
+        assertEquals(8, catalog.load().size());
+        assertTrue(dominios.contains("historico"));
         assertThrows(IllegalArgumentException.class, () -> catalog.parse("{\"dominio\":\"financeiro\",\"secoes\":[]}"));
     }
 
@@ -40,7 +41,7 @@ class RagTest {
     void chunkDescartaVazioDeduplicaEGuardaOrigem() {
         SourceDocument base = catalog.find("regras-comprovantes");
         SourceDocument.Section prazo = base.secoes().get(0);
-        SourceDocument doc = new SourceDocument(
+        SourceDocument doc = SourceDocument.vigente(
                 base.id(), base.titulo(), base.tipo(), base.dominio(), base.versao(),
                 base.dataAtualizacao(), base.owner(), base.acesso(),
                 List.of(new SourceDocument.Section("vazia", "   "), prazo, prazo));
@@ -142,7 +143,8 @@ class RagTest {
         assertTrue(arquivoB.contains("entregas"));
         assertFalse(arquivoA.contains("entregas"));
 
-        memory.save(new SessionMemory.State("op-m", "resumo", "coletas", List.of("regra secreta 99 horas"), 0));
+        memory.save(new SessionMemory.State(
+                "op-m", "resumo", "coletas", List.of("regra secreta 99 horas"), 0, "operacao", "", ""));
         RagAnswer semFonte = assistant.ask(index, "op-m", "operador", "regra secreta 99 horas", 1_000, config);
         assertFalse(semFonte.found());
         assertFalse(semFonte.render().contains("99"));
@@ -202,6 +204,9 @@ class RagTest {
         assertTrue(readme.contains("exec:java@rag"));
         assertTrue(readme.contains("-Dexec.args=ingest"));
         assertTrue(readme.contains("TokenEmbedder"));
+        assertTrue(readme.contains("namespace histórico"));
+        assertTrue(readme.contains("expirado"));
+        assertTrue(readme.contains("chave de API"));
     }
 
     private ChunkIndex ingest() throws Exception {
@@ -213,7 +218,7 @@ class RagTest {
     }
 
     private static KnowledgeChunk chunk(String doc, String dominio, String acesso, String secao, String texto) {
-        SourceDocument source = new SourceDocument(
+        SourceDocument source = SourceDocument.vigente(
                 doc, doc, "tipo", dominio, "v1", "2026-03-01", "operacao", acesso,
                 List.of(new SourceDocument.Section(secao, texto)));
         return new Chunker().chunk(source, 240, 20).get(0);

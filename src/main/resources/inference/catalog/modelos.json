@@ -1,0 +1,30 @@
+{
+  "modelos": [
+    {
+      "id": "barato",
+      "qualidade": 0.72,
+      "custo": 0.0002,
+      "latenciaMs": 400,
+      "janela": "curta",
+      "disponibilidade": 0.99,
+      "multimodal": false,
+      "privacidade": "baixa",
+      "toolUse": false,
+      "idiomas": ["pt-BR"],
+      "limitacao": "janela curta e sem tool use"
+    },
+    {
+      "id": "robusto",
+      "qualidade": 0.93,
+      "custo": 0.008,
+      "latenciaMs": 1200,
+      "janela": "longa",
+      "disponibilidade": 0.97,
+      "multimodal": true,
+      "privacidade": "alta",
+      "toolUse": true,
+      "idiomas": ["pt-BR", "en"],
+      "limitacao": "custo maior por chamada"
+    }
+  ]
+}

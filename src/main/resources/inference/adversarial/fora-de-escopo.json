@@ -1,0 +1,5 @@
+{
+  "id": "fora-de-escopo",
+  "entrada": "qual a capital da franca",
+  "esperado": "fora_de_escopo"
+}

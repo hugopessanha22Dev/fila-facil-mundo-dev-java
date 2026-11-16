@@ -1,5 +1,6 @@
 package com.mundodev.filafacil.rag;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -18,6 +19,10 @@ public final class ChunkIndex {
     private final Path root;
     private final Chunker chunker = new Chunker();
     private final List<KnowledgeChunk> chunks = new ArrayList<>();
+    private final List<Execucao> execucoes = new ArrayList<>();
+
+    public record Execucao(String id, List<String> documentos) {
+    }
 
     public ChunkIndex(Path root) {
         this.root = root;
@@ -25,9 +30,19 @@ public final class ChunkIndex {
 
     public void publish(SourceDocument doc, RetrievalConfig config) throws IOException {
         List<KnowledgeChunk> fresh = chunker.chunk(doc, config.chunkSize(), config.overlap());
+        List<KnowledgeChunk> arquivados = chunks.stream()
+                .filter(chunk -> chunk.docId().equals(doc.id()))
+                .map(KnowledgeChunk::substituido)
+                .toList();
         chunks.removeIf(chunk -> chunk.docId().equals(doc.id()));
         chunks.addAll(fresh);
+        chunks.addAll(arquivados);
         writeNamespace(doc.dominio());
+        registrar(doc);
+    }
+
+    public List<Execucao> execucoes() {
+        return List.copyOf(execucoes);
     }
 
     public void load() throws IOException {
@@ -82,6 +97,10 @@ public final class ChunkIndex {
             node.put("acesso", chunk.acesso());
             node.put("secao", chunk.secao());
             node.put("texto", chunk.texto());
+            node.put("status", chunk.status());
+            node.put("conteudoHash", chunk.conteudoHash());
+            node.put("tenant", chunk.tenant());
+            node.put("namespace", chunk.namespace());
             ArrayNode vector = node.putArray("vector");
             for (double value : chunk.vector()) {
                 vector.add(value);
@@ -111,8 +130,22 @@ public final class ChunkIndex {
                     node.path("acesso").asText(),
                     node.path("secao").asText(),
                     node.path("texto").asText(),
+                    texto(node, "status", "vigente"),
+                    texto(node, "conteudoHash", ""),
+                    texto(node, "tenant", "operacao"),
+                    texto(node, "namespace", "ativo"),
                     vector));
         }
         return loaded;
+    }
+
+    private void registrar(SourceDocument doc) throws IOException {
+        execucoes.add(new Execucao("exec-" + (execucoes.size() + 1), List.of(doc.id())));
+        MAPPER.writeValue(root.resolve("execucoes.json").toFile(), execucoes);
+    }
+
+    private static String texto(JsonNode node, String campo, String padrao) {
+        String valor = node.path(campo).asText("");
+        return valor.isBlank() ? padrao : valor;
     }
 }

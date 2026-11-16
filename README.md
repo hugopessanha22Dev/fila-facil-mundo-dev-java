@@ -174,7 +174,9 @@ No GitHub Actions o passo `evaluate` roda depois de `mvn test`. Exit code difere
 
 O assistente de Memory & Retrieval responde com trecho citado da base operacional. O embedding é o `TokenEmbedder` local, em arquivo, sem API e sem banco vetorial na nuvem. O menu do terminal continua nas opções 0 a 12.
 
-A base fictícia fica em `src/main/resources/rag/corpus/`: política de coletas, política de entregas, manual de ocorrências, FAQ de atendimento, regras de comprovantes, procedimento de atraso e instruções para parceiros. Cada documento tem título, tipo, domínio, versão, data, owner e nível de acesso. Publicar outra versão troca só os chunks daquele documento.
+A base fictícia fica em `src/main/resources/rag/corpus/`: política de coletas, política de entregas, manual de ocorrências, FAQ de atendimento, regras de comprovantes, procedimento de atraso, instruções para parceiros e histórico operacional. Cada documento tem título, tipo, domínio, versão, data, owner, nível de acesso e status. Publicar outra versão troca os chunks daquele documento e guarda a anterior no namespace histórico.
+
+O documento vigente entra na busca operacional. O expirado fica de fora, e o que está em revisão só aparece para o acesso de revisão. A sessão não grava chave de API nem sequência longa de dígitos: memória de conversa não é lugar de segredo.
 
 ```powershell
 mvn -q compile exec:java@rag "-Dexec.args=ingest"
@@ -190,7 +192,9 @@ A resposta separa `evidencia` e `orientacao` e cita documento, versão e seção
 
 O agente trata atraso, endereço incorreto, falha de coleta e ocorrência crítica. O plano de cada passo é local: uma ferramenta por vez, sem chamada paga de modelo. O menu do terminal continua nas opções 0 a 12.
 
-Ferramentas permitidas: `consultar_coleta`, `buscar_cliente`, `registrar_ocorrencia`, `consultar_regras`, `notificar`, `calcular_prioridade` e `escalar_humano`. Consulta, prioridade, ocorrência e escala reusam o mock de triagem quando o código é numérico. A regra vem da base RAG já indexada. Cliente, ocorrência e notificação ficam numa simulação em memória e não gravam `data/coletas.json`.
+Ferramentas permitidas: `consultar_coleta`, `consultar_entrega`, `buscar_cliente`, `registrar_ocorrencia`, `consultar_regras`, `notificar`, `publicar_fila`, `consultar_historico`, `consultar_portal`, `calcular_prioridade` e `escalar_humano`. Consulta, prioridade, ocorrência e escala reusam o mock de triagem quando o código é numérico. A regra vem da base RAG já indexada. Cliente, ocorrência e notificação ficam numa simulação em memória e não gravam `data/coletas.json`.
+
+O fluxo também tem tempo máximo. Ação de alto impacto espera aprovação humana. O plano barrado antes da chamada não executa ferramenta.
 
 ```powershell
 mvn -q compile exec:java@agent "-Dexec.args=run --text status da entrega atrasada codigo ENT-100"
@@ -212,8 +216,11 @@ Paradas:
 | `ferramenta_indisponivel` | A consulta falhou até o teto de tentativas |
 | `falha_ferramenta` | A escrita da ocorrência falhou até o teto |
 | `argumento_invalido` | Registro ou notificação sem o dado mínimo |
+| `tempo` | Passou do tempo máximo e nenhuma chamada nova foi feita |
+| `plano_bloqueado` | O plano inseguro foi barrado antes da chamada |
+| `aguardando_aprovacao` | A ação de alto impacto espera aprovação humana |
 
-Ação sensível só grava depois de o schema passar. O trace marca `confirmado` e, em seguida, `gravado`. `eval` mede sucesso, custo estimado, latência, passos, ferramentas, falhas, escalonamentos e aderência. Sai com código 0 só quando os nove cenários de `agent/scenarios.json` batem a parada esperada. Esses cenários ficam fora dos 3 casos do eval antigo.
+Ação sensível só grava depois de o schema passar. O trace marca `confirmado` e, em seguida, `gravado`. `eval` mede sucesso, custo estimado, latência, passos, ferramentas, falhas, escalonamentos e aderência, e também retries, robustez, segurança e qualidade da trajetória. Sai com código 0 só quando os treze cenários de `agent/scenarios.json` batem a parada esperada. Esses cenários ficam fora dos 3 casos do eval antigo.
 
 ## Orquestrador de exceções
 
@@ -226,6 +233,21 @@ mvn -q compile exec:java@excecoes "-Dexec.args=abrir --entrega ENT-1 --tipo clie
 ```
 
 O mapa dos contextos e a decisão de desenho estão em `docs/excecoes/`. Termos de roteirização, atendimento e financeiro passam pelo gateway antes de virar tipo e origem.
+
+## Inferência por tarefa
+
+O catálogo separa cinco tarefas: classificação, extração, resumo, resposta assistida e busca contextual. Classificação simples usa o modelo barato. Extração, tool use, risco alto e contexto longo usam o modelo robusto. O fallback é recusado quando a privacidade do reserva fica abaixo da tarefa.
+
+Toda chamada passa por `GatewayResiliente`, identificado como `gateway-central`. O circuit breaker fica na memória do processo: abre depois do limiar de falhas, a chamada seguinte não consulta o mock, e uma prova em half-open pode fechar o circuito. Rate limit, timeout e retry com espera dobrada vêm de `inference/catalog/limites.json`. O estado do circuito acaba quando o processo termina.
+
+A busca contextual não entra no cache. O contexto e a evidência mudam entre perguntas, e a tarefa exige groundedness; repetir a mesma pergunta consulta o provedor de novo. Classificação do mesmo texto pode ser servida do cache. A poda de contexto conserva o marcador `evidencia-critica`.
+
+```powershell
+mvn -q compile exec:java@inference-catalog "-Dexec.args=status"
+mvn -q compile exec:java@inference-catalog "-Dexec.args=executar --tarefa classificacao --texto pedido atrasado"
+```
+
+Os testes usam o mock, sem chamada paga. O menu do terminal continua nas opções 0 a 12. Os casos ambíguo, incompleto, longo e fora de escopo ficam em `inference/adversarial/`, fora dos 3 casos do eval antigo. Uma candidata só é promovida se a queda de acurácia e de formato ficar dentro do limite.
 
 ## Pré-requisitos
 
@@ -354,10 +376,14 @@ No atendimento conversacional: `/reset` limpa a sessao; `/fim` encerra sem concl
 
 Resources versionados:
 
-- `src/main/resources/inference/prompts/` — `classify`, `extract`, `summarize`, `internal-reply`, `transform`
+- `src/main/resources/inference/prompts/` — `classify`, `extract`, `summarize`, `internal-reply`, `transform`, `priorizar`, `camadas.json`
 - `src/main/resources/inference/fewshot/catalog.json` — exemplos positivo / negativo / contraexemplo / escalacao (dados ficticios)
 
-Cada prompt declara objetivo, contexto, restricoes, criterios e formato de saida. O `PromptComposer` monta system prompt = template + few-shot + memoria da sessao.
+Cada prompt declara objetivo, contexto, restricoes, criterios e formato de saida. O `PromptComposer` monta o system prompt em tres camadas: regras globais, regras da tarefa e regras de formato. A mensagem do operador fica entre `<<<ENTRADA>>>` e `<<<FIM>>>`, fora da instrucao. Em seguida entram os exemplos few-shot e a memoria da sessao.
+
+A priorizacao guiada percorre quatro etapas, nesta ordem: intencao, entidades, evidencias e resposta. Sem evidencia, a prioridade nao sai como fato.
+
+A resposta calibrada existe porque prazo, status, responsavel, politica interna ou codigo sem fonte autorizada viram incerteza. Inventar um desses dados e pior do que pedir clarificacao. A memoria da sessao nao substitui documento nem resultado de ferramenta.
 
 ## Fluxo conversacional e grounding
 

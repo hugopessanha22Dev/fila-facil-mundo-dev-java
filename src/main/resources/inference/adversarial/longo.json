@@ -1,0 +1,5 @@
+{
+  "id": "longo",
+  "entrada": "o cliente descreve a rota inteira, repete o endereco, o nome do motorista, a janela, o comprovante e o historico da coleta sem indicar qual trecho importa para a decisao operacional de hoje",
+  "esperado": "longo"
+}

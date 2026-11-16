@@ -1,7 +1,12 @@
 package com.mundodev.filafacil.agent;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mundodev.filafacil.inference.tools.OperationalTools;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +17,18 @@ public final class AgentTools {
     public static final String AUSENTE = "ausente";
     public static final Set<String> PERMITIDAS = Set.of(
             "consultar_coleta",
+            "consultar_entrega",
             "buscar_cliente",
             "registrar_ocorrencia",
             "consultar_regras",
             "notificar",
+            "publicar_fila",
+            "consultar_historico",
+            "consultar_portal",
             "calcular_prioridade",
             "escalar_humano");
+
+    private static final Map<String, Set<String>> PERMISSOES = carregarPermissoes();
 
     private final OpsWorld world;
     private final RagRules rules;
@@ -34,19 +45,30 @@ public final class AgentTools {
     }
 
     public ToolOutcome call(String name, Map<String, Object> args) {
+        return call(name, args, "operador");
+    }
+
+    public ToolOutcome call(String name, Map<String, Object> args, String papel) {
         if (!PERMITIDAS.contains(name)) {
             return ToolOutcome.blocked("fora_escopo");
         }
-        return switch (name) {
-            case "consultar_coleta" -> consultar(text(args, "codigo"));
+        if (!PERMISSOES.getOrDefault(papel, Set.of()).contains(name)) {
+            return ToolOutcome.blocked("sem_permissao");
+        }
+        ToolOutcome outcome = switch (name) {
+            case "consultar_coleta", "consultar_entrega" -> consultar(text(args, "codigo"));
             case "buscar_cliente" -> buscarCliente(text(args, "id"));
             case "registrar_ocorrencia" -> registrar(text(args, "codigo"), text(args, "tipo"), text(args, "descricao"));
             case "consultar_regras" -> regras(text(args, "pergunta"));
             case "notificar" -> notificar(text(args, "codigo"), text(args, "mensagem"));
+            case "publicar_fila" -> publicarFila(text(args, "codigo"), text(args, "mensagem"));
+            case "consultar_historico" -> historico(text(args, "codigo"));
+            case "consultar_portal" -> portal(text(args, "codigo"));
             case "calcular_prioridade" -> prioridade(text(args, "tipo"), text(args, "sentimento"));
             case "escalar_humano" -> escalar(text(args, "motivo"), text(args, "codigo"), text(args, "estado"), text(args, "dados"));
             default -> ToolOutcome.blocked("fora_escopo");
         };
+        return outcome.comPermissao();
     }
 
     private ToolOutcome consultar(String codigo) {
@@ -59,6 +81,20 @@ public final class AgentTools {
             data.put("status", AUSENTE);
             data.put("cliente", AUSENTE);
             return ToolOutcome.failed("indisponivel", data);
+        }
+        if (world.consumirFalhaTemporaria()) {
+            Map<String, Object> data = base();
+            data.put("encontrada", false);
+            data.put("status", AUSENTE);
+            data.put("cliente", AUSENTE);
+            return ToolOutcome.failed("temporario", data);
+        }
+        if (world.erroPermanente()) {
+            Map<String, Object> data = base();
+            data.put("encontrada", false);
+            data.put("status", AUSENTE);
+            data.put("cliente", AUSENTE);
+            return ToolOutcome.failed("permanente", data);
         }
         OpsWorld.Delivery delivery = world.delivery(codigo);
         if (delivery == null && codigo.chars().allMatch(Character::isDigit)) {
@@ -143,6 +179,49 @@ public final class AgentTools {
         return new ToolOutcome(true, true, "", data, List.of("confirmado", "enfileirado"));
     }
 
+    private ToolOutcome publicarFila(String codigo, String mensagem) {
+        if (codigo.isBlank() || mensagem.isBlank()) {
+            return ToolOutcome.invalid();
+        }
+        String payload = codigo + " | " + mensagem;
+        world.addNotice(new OpsWorld.Notice(payload, System.currentTimeMillis(), "fila"));
+        Map<String, Object> data = base();
+        data.put("publicacao", "publicada");
+        data.put("payload", payload);
+        return ToolOutcome.ok(data);
+    }
+
+    private ToolOutcome historico(String codigo) {
+        if (codigo.isBlank()) {
+            return ToolOutcome.invalid();
+        }
+        List<String> eventos = world.occurrences().stream()
+                .filter(item -> codigo.equals(item.codigo()))
+                .map(item -> item.tipo() + ":" + item.descricao())
+                .toList();
+        Map<String, Object> data = base();
+        data.put("eventos", eventos);
+        data.put("encontrada", !eventos.isEmpty());
+        return ToolOutcome.ok(data);
+    }
+
+    private ToolOutcome portal(String codigo) {
+        if (codigo.isBlank()) {
+            return ToolOutcome.invalid();
+        }
+        OpsWorld.Delivery delivery = world.delivery(codigo);
+        Map<String, Object> data = base();
+        if (delivery == null) {
+            data.put("encontrada", false);
+            data.put("pagina", AUSENTE);
+            return ToolOutcome.ok(data);
+        }
+        data.put("encontrada", true);
+        data.put("pagina", "portal interno " + codigo);
+        data.put("status", delivery.status());
+        return ToolOutcome.ok(data);
+    }
+
     private ToolOutcome prioridade(String tipo, String sentimento) {
         String value = triage.calcularPrioridadeOperacional(tipo, sentimento);
         Map<String, Object> data = base();
@@ -196,6 +275,32 @@ public final class AgentTools {
 
         public static ToolOutcome blocked(String erro) {
             return new ToolOutcome(false, false, erro, Map.of(), List.of(erro));
+        }
+
+        public ToolOutcome comPermissao() {
+            List<String> conferida = new ArrayList<>();
+            conferida.add("permissao_conferida");
+            conferida.addAll(eventos);
+            return new ToolOutcome(ok, executada, erro, dados, List.copyOf(conferida));
+        }
+    }
+
+    private static Map<String, Set<String>> carregarPermissoes() {
+        ObjectMapper mapper = new ObjectMapper();
+        try (InputStream in = AgentTools.class.getResourceAsStream("/agent/permissoes.json")) {
+            if (in == null) {
+                throw new IllegalStateException("permissoes.json ausente");
+            }
+            Map<String, Set<String>> papeis = new LinkedHashMap<>();
+            JsonNode root = mapper.readTree(in);
+            root.fieldNames().forEachRemaining(papel -> {
+                Set<String> nomes = new java.util.LinkedHashSet<>();
+                root.path(papel).forEach(item -> nomes.add(item.asText()));
+                papeis.put(papel, Set.copyOf(nomes));
+            });
+            return Map.copyOf(papeis);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Falha ao ler permissoes.json", ex);
         }
     }
 }

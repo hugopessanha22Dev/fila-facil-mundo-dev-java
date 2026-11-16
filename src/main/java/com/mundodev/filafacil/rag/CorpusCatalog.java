@@ -12,7 +12,7 @@ import java.util.Set;
 public final class CorpusCatalog {
 
     public static final Set<String> DOMINIOS = Set.of(
-            "coletas", "entregas", "ocorrencias", "atendimento", "comprovantes", "atraso", "parceiros");
+            "coletas", "entregas", "ocorrencias", "atendimento", "comprovantes", "atraso", "parceiros", "historico");
 
     private static final List<String> FILES = List.of(
             "/rag/corpus/politica-coletas.json",
@@ -21,7 +21,8 @@ public final class CorpusCatalog {
             "/rag/corpus/faq-atendimento.json",
             "/rag/corpus/regras-comprovantes.json",
             "/rag/corpus/procedimento-atraso.json",
-            "/rag/corpus/instrucoes-parceiros.json");
+            "/rag/corpus/instrucoes-parceiros.json",
+            "/rag/corpus/historico-operacional.json");
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -75,6 +76,17 @@ public final class CorpusCatalog {
                 node.path("dataAtualizacao").asText(),
                 node.path("owner").asText(),
                 node.path("acesso").asText(),
-                List.copyOf(secoes));
+                List.copyOf(secoes),
+                texto(node, "status", "vigente"),
+                SourceDocument.hashDe(secoes),
+                texto(node, "versaoAnterior", ""),
+                texto(node, "versaoPosterior", ""),
+                texto(node, "tenant", "operacao"),
+                texto(node, "namespace", "ativo"));
+    }
+
+    private static String texto(JsonNode node, String campo, String padrao) {
+        String valor = node.path(campo).asText("");
+        return valor.isBlank() ? padrao : valor;
     }
 }

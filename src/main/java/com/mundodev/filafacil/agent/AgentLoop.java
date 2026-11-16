@@ -20,10 +20,16 @@ public final class AgentLoop {
 
     private final AgentTools tools;
     private final AgentLimits limits;
+    private final Relogio relogio;
 
     public AgentLoop(AgentTools tools, AgentLimits limits) {
+        this(tools, limits, Relogio.sistema());
+    }
+
+    public AgentLoop(AgentTools tools, AgentLimits limits, Relogio relogio) {
         this.tools = tools;
         this.limits = limits;
+        this.relogio = relogio;
     }
 
     public static AgentLoop create(RagRules rules, AgentLimits limits, OperationalTools triage) {
@@ -44,12 +50,30 @@ public final class AgentLoop {
         return execute(texto);
     }
 
+    public Run run(
+            String texto,
+            boolean consultaIndisponivel,
+            boolean erroEscrita,
+            int falhasTemporarias,
+            boolean erroPermanente) {
+        tools.world().setFalhasTemporarias(falhasTemporarias);
+        tools.world().setErroPermanente(erroPermanente);
+        return run(texto, consultaIndisponivel, erroEscrita);
+    }
+
     private Run execute(String texto) {
         long start = System.nanoTime();
+        long inicio = relogio.agoraMs();
         String message = texto == null ? "" : texto.trim();
         Intent intent = classify(message);
         State state = new State(field(CODIGO, message), field(TIPO, message), field(DESCRICAO, message));
         List<Step> trace = new ArrayList<>();
+        if (intent == Intent.INSEGURO) {
+            return finish("plano_bloqueado", state, trace, start, "Plano inseguro barrado antes da chamada.");
+        }
+        if (intent == Intent.AGUARDANDO) {
+            return finish("aguardando_aprovacao", state, trace, start, "Aguardar aprovacao humana.");
+        }
         if (intent == Intent.FORA) {
             return finish("fora_dominio", state, trace, start, "Recusar fora do dominio logistico.");
         }
@@ -58,6 +82,9 @@ public final class AgentLoop {
         }
         int calls = 0;
         while (true) {
+            if (relogio.agoraMs() - inicio > limits.maxDurationMs()) {
+                return finish("tempo", state, trace, start, "Encerrar por tempo maximo.");
+            }
             if (trace.size() >= limits.maxSteps() || calls >= limits.maxCalls()) {
                 return finish("limite", state, trace, start, "Encerrar por limite de execucao.");
             }
@@ -110,6 +137,10 @@ public final class AgentLoop {
         }
         if (!outcome.ok() && outcome.executada()) {
             int attempts = state.failures.getOrDefault(tool, 0);
+            if ("permanente".equals(outcome.erro()) && attempts >= limits.maxAttemptsPerTool()) {
+                state.permanenteEsgotada = true;
+                return null;
+            }
             if (attempts >= limits.maxAttemptsPerTool()) {
                 return "indisponivel".equals(outcome.erro()) ? "ferramenta_indisponivel" : "falha_ferramenta";
             }
@@ -170,6 +201,20 @@ public final class AgentLoop {
     private Planned next(Intent intent, State state) {
         if (intent == Intent.PROIBIDA) {
             return new Planned("apagar_banco", Map.of());
+        }
+        if (state.permanenteEsgotada) {
+            if (!state.escalou) {
+                return escala(state, "Falha permanente");
+            }
+            return null;
+        }
+        if (intent == Intent.APROVADO) {
+            if (!state.notificou) {
+                return new Planned("notificar", Map.of(
+                        "codigo", state.codigo,
+                        "mensagem", "aprovacao concedida"));
+            }
+            return null;
         }
         if (intent == Intent.CRITICO) {
             if (!state.codigo.isBlank() && !state.consultada) {
@@ -255,6 +300,12 @@ public final class AgentLoop {
 
     private static Intent classify(String texto) {
         String lower = texto.toLowerCase(Locale.ROOT);
+        if (lower.contains("plano inseguro")) {
+            return Intent.INSEGURO;
+        }
+        if (lower.contains("impacto alto")) {
+            return lower.contains("aprovacao concedida") ? Intent.APROVADO : Intent.AGUARDANDO;
+        }
         if (lower.contains("apagar_banco")) {
             return Intent.PROIBIDA;
         }
@@ -328,6 +379,12 @@ public final class AgentLoop {
         dados.put("prioridade", blank(state.prioridade));
         dados.put("ocorrencia", state.registrada ? "registrada" : AgentTools.AUSENTE);
         dados.put("notificacao", state.notificou ? "enfileirada" : AgentTools.AUSENTE);
+        int retries = state.failures.values().stream().mapToInt(Integer::intValue).sum();
+        List<String> etapas = etapasDe(trace);
+        String pendencia = "aguardando_aprovacao".equals(parada) ? "notificar" : "nenhuma";
+        String resumo = "evidencias: " + dados
+                + " acoes: " + acoes
+                + " pendencias: " + pendencia;
         return new Run(
                 parada,
                 parada,
@@ -340,7 +397,27 @@ public final class AgentLoop {
                 escalonamentos,
                 aderente,
                 latencia,
-                acoes.size());
+                acoes.size(),
+                retries,
+                etapas,
+                resumo);
+    }
+
+    private static List<String> etapasDe(List<Step> trace) {
+        List<String> etapas = new ArrayList<>();
+        etapas.add("interpretacao");
+        etapas.add("planejamento");
+        etapas.add("validacao");
+        if (!trace.isEmpty()) {
+            etapas.add("execucao");
+            etapas.add("observacao");
+            etapas.add("atualizacao");
+            etapas.add("reflexao");
+            etapas.add("revisao");
+        }
+        etapas.add("aprovacao");
+        etapas.add("resposta final");
+        return List.copyOf(etapas);
     }
 
     private static String blank(String value) {
@@ -367,7 +444,7 @@ public final class AgentLoop {
     }
 
     private enum Intent {
-        FORA, PROIBIDA, LOOP, CRITICO, ATRASO, ENDERECO, COLETA, OCORRENCIA
+        FORA, PROIBIDA, LOOP, CRITICO, ATRASO, ENDERECO, COLETA, OCORRENCIA, INSEGURO, AGUARDANDO, APROVADO
     }
 
     private static final class State {
@@ -384,6 +461,7 @@ public final class AgentLoop {
         private boolean prioridadeFeita;
         private boolean notificou;
         private boolean escalou;
+        private boolean permanenteEsgotada;
         private String clienteId = "";
         private String status = "";
         private String cliente = "";
@@ -428,7 +506,10 @@ public final class AgentLoop {
             int escalonamentos,
             boolean aderente,
             long latenciaMs,
-            int custoEstimado) {
+            int custoEstimado,
+            int retries,
+            List<String> etapas,
+            String resumo) {
 
         public String render() {
             StringBuilder out = new StringBuilder();

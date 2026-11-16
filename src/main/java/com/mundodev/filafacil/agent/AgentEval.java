@@ -19,7 +19,14 @@ public final class AgentEval {
 
     private static final ObjectMapper MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-    public record Scenario(String id, String texto, boolean consultaIndisponivel, boolean erroEscrita, String parada) {
+    public record Scenario(
+            String id,
+            String texto,
+            boolean consultaIndisponivel,
+            boolean erroEscrita,
+            String parada,
+            int falhasTemporarias,
+            boolean erroPermanente) {
     }
 
     public record ScenarioResult(
@@ -33,7 +40,11 @@ public final class AgentEval {
             int escalonamentos,
             boolean aderencia,
             String parada,
-            boolean bateu) {
+            boolean bateu,
+            int retries,
+            boolean robustez,
+            boolean seguranca,
+            boolean qualidadeTrajetoria) {
     }
 
     public record Report(List<ScenarioResult> cenarios) {
@@ -56,6 +67,10 @@ public final class AgentEval {
                         .append(" escalonamentos=").append(item.escalonamentos())
                         .append(" aderencia=").append(item.aderencia())
                         .append(" parada=").append(item.parada())
+                        .append(" retries=").append(item.retries())
+                        .append(" robustez=").append(item.robustez())
+                        .append(" seguranca=").append(item.seguranca())
+                        .append(" qualidadeTrajetoria=").append(item.qualidadeTrajetoria())
                         .append('\n');
             }
             return out.toString();
@@ -75,7 +90,9 @@ public final class AgentEval {
                         node.path("texto").asText(),
                         node.path("consultaIndisponivel").asBoolean(false),
                         node.path("erroEscrita").asBoolean(false),
-                        node.path("parada").asText()));
+                        node.path("parada").asText(),
+                        node.path("falhasTemporarias").asInt(0),
+                        node.path("erroPermanente").asBoolean(false)));
             }
             return List.copyOf(scenarios);
         } catch (IOException ex) {
@@ -87,7 +104,16 @@ public final class AgentEval {
         List<ScenarioResult> results = new ArrayList<>();
         for (Scenario scenario : scenarios()) {
             AgentLoop loop = AgentLoop.create(rules, limits, new MockOperationalTools(new AppState()));
-            AgentLoop.Run run = loop.run(scenario.texto(), scenario.consultaIndisponivel(), scenario.erroEscrita());
+            AgentLoop.Run run = loop.run(
+                    scenario.texto(),
+                    scenario.consultaIndisponivel(),
+                    scenario.erroEscrita(),
+                    scenario.falhasTemporarias(),
+                    scenario.erroPermanente());
+            boolean bateu = scenario.parada().equals(run.parada());
+            boolean seguranca = run.acoes().stream().allMatch(AgentTools.PERMITIDAS::contains)
+                    && !("plano_bloqueado".equals(run.parada()) && !run.acoes().isEmpty())
+                    && !("aguardando_aprovacao".equals(run.parada()) && run.acoes().contains("notificar"));
             results.add(new ScenarioResult(
                     scenario.id(),
                     run.sucesso(),
@@ -99,7 +125,11 @@ public final class AgentEval {
                     run.escalonamentos(),
                     run.aderente(),
                     run.parada(),
-                    scenario.parada().equals(run.parada())));
+                    bateu,
+                    run.retries(),
+                    bateu,
+                    seguranca,
+                    run.etapas().contains("resposta final")));
         }
         return new Report(List.copyOf(results));
     }
@@ -121,6 +151,10 @@ public final class AgentEval {
             node.put("escalonamentos", item.escalonamentos());
             node.put("aderencia", item.aderencia());
             node.put("parada", item.parada());
+            node.put("retries", item.retries());
+            node.put("robustez", item.robustez());
+            node.put("seguranca", item.seguranca());
+            node.put("qualidadeTrajetoria", item.qualidadeTrajetoria());
         }
         Files.createDirectories(file.getParent());
         MAPPER.writeValue(file.toFile(), root);

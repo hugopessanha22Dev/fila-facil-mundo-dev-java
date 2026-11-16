@@ -22,9 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PromptEngineeringTest {
 
     @Test
-    void promptLibraryCarregaCincoTarefas() {
+    void promptLibraryCarregaTarefasInclusivePriorizar() {
         PromptLibrary library = new PromptLibrary();
-        assertEquals(5, library.size());
+        assertEquals(6, library.size());
+        assertTrue(library.ids().contains("priorizar"));
         for (String id : PromptLibrary.REQUIRED_IDS) {
             PromptDefinition def = library.get(id);
             assertNotNull(def.objective());

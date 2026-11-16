@@ -1,0 +1,5 @@
+{
+  "id": "ambiguo",
+  "entrada": "a entrega chegou e tambem nao chegou",
+  "esperado": "ambiguo"
+}

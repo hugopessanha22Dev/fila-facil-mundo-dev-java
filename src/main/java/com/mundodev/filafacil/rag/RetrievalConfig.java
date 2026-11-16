@@ -13,7 +13,8 @@ public record RetrievalConfig(
         double hybridWeight,
         boolean rerank,
         int sessionTtlMinutes,
-        double cutoff) {
+        double cutoff,
+        int maxTopK) {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -30,33 +31,38 @@ public record RetrievalConfig(
                     node.path("hybridWeight").asDouble(),
                     node.path("rerank").asBoolean(),
                     node.path("sessionTtlMinutes").asInt(),
-                    node.path("cutoff").asDouble());
+                    node.path("cutoff").asDouble(),
+                    node.path("maxTopK").asInt(6));
         } catch (IOException ex) {
             throw new IllegalStateException("Falha ao ler retrieval.json", ex);
         }
     }
 
     public RetrievalConfig withChunkSize(int size) {
-        return new RetrievalConfig(size, overlap, topK, hybridWeight, rerank, sessionTtlMinutes, cutoff);
+        return new RetrievalConfig(size, overlap, topK, hybridWeight, rerank, sessionTtlMinutes, cutoff, maxTopK);
     }
 
     public RetrievalConfig withOverlap(int value) {
-        return new RetrievalConfig(chunkSize, value, topK, hybridWeight, rerank, sessionTtlMinutes, cutoff);
+        return new RetrievalConfig(chunkSize, value, topK, hybridWeight, rerank, sessionTtlMinutes, cutoff, maxTopK);
     }
 
     public RetrievalConfig withTopK(int value) {
-        return new RetrievalConfig(chunkSize, overlap, value, hybridWeight, rerank, sessionTtlMinutes, cutoff);
+        return new RetrievalConfig(chunkSize, overlap, value, hybridWeight, rerank, sessionTtlMinutes, cutoff, maxTopK);
     }
 
     public RetrievalConfig withHybridWeight(double value) {
-        return new RetrievalConfig(chunkSize, overlap, topK, value, rerank, sessionTtlMinutes, cutoff);
+        return new RetrievalConfig(chunkSize, overlap, topK, value, rerank, sessionTtlMinutes, cutoff, maxTopK);
     }
 
     public RetrievalConfig withRerank(boolean value) {
-        return new RetrievalConfig(chunkSize, overlap, topK, hybridWeight, value, sessionTtlMinutes, cutoff);
+        return new RetrievalConfig(chunkSize, overlap, topK, hybridWeight, value, sessionTtlMinutes, cutoff, maxTopK);
     }
 
     public RetrievalConfig withCutoff(double value) {
-        return new RetrievalConfig(chunkSize, overlap, topK, hybridWeight, rerank, sessionTtlMinutes, value);
+        return new RetrievalConfig(chunkSize, overlap, topK, hybridWeight, rerank, sessionTtlMinutes, value, maxTopK);
+    }
+
+    public RetrievalConfig withMaxTopK(int value) {
+        return new RetrievalConfig(chunkSize, overlap, topK, hybridWeight, rerank, sessionTtlMinutes, cutoff, value);
     }
 }

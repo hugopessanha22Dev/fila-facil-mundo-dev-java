@@ -1,0 +1,18 @@
+{
+  "operador": [
+    "consultar_coleta",
+    "consultar_entrega",
+    "buscar_cliente",
+    "registrar_ocorrencia",
+    "consultar_regras",
+    "notificar",
+    "publicar_fila",
+    "consultar_historico",
+    "consultar_portal",
+    "calcular_prioridade",
+    "escalar_humano"
+  ],
+  "restrito": [
+    "consultar_coleta"
+  ]
+}

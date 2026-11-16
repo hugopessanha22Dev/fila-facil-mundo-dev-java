@@ -182,6 +182,12 @@
                             <mainClass>com.mundodev.filafacil.excecoes.adapters.ExcecoesMain</mainClass>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>inference-catalog</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.inference.catalog.CatalogMain</mainClass>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

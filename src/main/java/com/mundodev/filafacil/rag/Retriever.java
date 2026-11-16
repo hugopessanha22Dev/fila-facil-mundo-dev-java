@@ -12,26 +12,31 @@ public final class Retriever {
     public record Hit(KnowledgeChunk chunk, double score) {
     }
 
-    public record SearchFilter(String role, String domain, String tipo, String versao) {
+    public record SearchFilter(String role, String domain, String tipo, String versao, String tenant, boolean historico) {
 
         public static SearchFilter of(String role, String domain) {
-            return new SearchFilter(role, domain, null, null);
+            return new SearchFilter(role, domain, null, null, "operacao", false);
+        }
+
+        public SearchFilter comTenant(String novoTenant) {
+            return new SearchFilter(role, domain, tipo, versao, novoTenant, historico);
         }
     }
 
     public List<Hit> search(List<KnowledgeChunk> chunks, String query, SearchFilter filter, RetrievalConfig config) {
-        double[] queryVector = TokenEmbedder.embed(query);
+        String expanded = QueryExpander.expand(query);
+        double[] queryVector = TokenEmbedder.embed(expanded);
         List<Hit> hits = new ArrayList<>();
         for (KnowledgeChunk chunk : chunks) {
             if (!visible(chunk, filter)) {
                 continue;
             }
             double cosine = TokenEmbedder.cosine(queryVector, chunk.vector());
-            double keyword = keywordFraction(query, chunk.texto());
+            double keyword = keywordFraction(expanded, chunk.texto());
             double weight = config.hybridWeight();
             double score = cosine * (1 - weight) + keyword * weight;
             if (config.rerank()) {
-                score += sectionOverlap(query, chunk.secao());
+                score += sectionOverlap(expanded, chunk.secao());
             }
             if (score < config.cutoff()) {
                 continue;
@@ -39,14 +44,35 @@ public final class Retriever {
             hits.add(new Hit(chunk, score));
         }
         hits.sort(Comparator.comparingDouble(Hit::score).reversed());
-        int limit = Math.max(1, config.topK());
+        int limit = limite(query, config);
         if (hits.size() > limit) {
             return List.copyOf(hits.subList(0, limit));
         }
         return List.copyOf(hits);
     }
 
+    private static int limite(String query, RetrievalConfig config) {
+        if (DomainIntent.dominiosDe(query).size() > 1) {
+            return Math.max(1, config.maxTopK());
+        }
+        return Math.max(1, config.topK());
+    }
+
     private static boolean visible(KnowledgeChunk chunk, SearchFilter filter) {
+        if (filter.tenant() != null && chunk.tenant() != null && !filter.tenant().equals(chunk.tenant())) {
+            return false;
+        }
+        String status = chunk.status() == null || chunk.status().isBlank() ? "vigente" : chunk.status();
+        if ("expirado".equals(status)) {
+            return false;
+        }
+        if ("em_revisao".equals(status) && !"revisor".equals(filter.role())) {
+            return false;
+        }
+        String namespace = chunk.namespace() == null || chunk.namespace().isBlank() ? "ativo" : chunk.namespace();
+        if (!filter.historico() && ("historico".equals(namespace) || "substituido".equals(status))) {
+            return false;
+        }
         if (filter.domain() != null && !filter.domain().equals(chunk.dominio())) {
             return false;
         }

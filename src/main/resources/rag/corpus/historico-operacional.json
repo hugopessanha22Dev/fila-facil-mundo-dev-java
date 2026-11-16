@@ -1,0 +1,21 @@
+{
+  "id": "historico-operacional",
+  "titulo": "Historico operacional",
+  "tipo": "historico",
+  "dominio": "historico",
+  "versao": "v1",
+  "dataAtualizacao": "2026-03-01",
+  "owner": "operacao",
+  "acesso": "operador",
+  "status": "vigente",
+  "tenant": "operacao",
+  "namespace": "ativo",
+  "versaoAnterior": "",
+  "versaoPosterior": "",
+  "secoes": [
+    {
+      "nome": "decisao",
+      "texto": "A ata ficticia registra a decisao de manter o fluxo interno. historico operacional decisao."
+    }
+  ]
+}

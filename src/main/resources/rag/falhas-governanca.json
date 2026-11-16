@@ -1,0 +1,22 @@
+[
+  {
+    "id": "documento_expirado",
+    "falha": "documento expirado",
+    "acao": "bloquear na busca ativa"
+  },
+  {
+    "id": "top_k_insuficiente",
+    "falha": "top-k insuficiente",
+    "acao": "ampliar o teto"
+  },
+  {
+    "id": "expansao_inadequada",
+    "falha": "expansão inadequada",
+    "acao": "preservar a intenção"
+  },
+  {
+    "id": "reranking_fraco",
+    "falha": "reranking fraco",
+    "acao": "religar o reranking"
+  }
+]

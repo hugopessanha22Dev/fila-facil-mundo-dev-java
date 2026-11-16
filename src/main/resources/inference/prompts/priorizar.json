@@ -1,0 +1,16 @@
+{
+  "id": "priorizar",
+  "objective": "Priorizar a ocorrencia depois de separar intencao, entidades e evidencias",
+  "context": "FilaFacil Logistica - decisao operacional do operador",
+  "inputExpected": "Ocorrencia em texto livre e evidencias fornecidas",
+  "constraints": [
+    "Nao publicar prioridade como fato sem evidencia",
+    "Concluir em quatro etapas: intencao, entidades, evidencias e resposta"
+  ],
+  "qualityCriteria": [
+    "Cada etapa aparece separada",
+    "Resposta calibrada quando faltar base"
+  ],
+  "outputFormat": "JSON com etapas, prioridadeComoFato e incerteza",
+  "systemTemplate": "Voce prioriza ocorrencias da FilaFacil em quatro etapas. Nao invente prazo, status, responsavel, politica ou codigo. Responda APENAS JSON."
+}

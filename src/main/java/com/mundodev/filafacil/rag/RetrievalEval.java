@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class RetrievalEval {
 
@@ -37,7 +39,8 @@ public final class RetrievalEval {
             int overlap,
             int topK,
             boolean rerank,
-            List<String> diagnosticos) {
+            List<String> diagnosticos,
+            List<String> governanca) {
 
         public String render() {
             return "precision=" + precision
@@ -52,6 +55,7 @@ public final class RetrievalEval {
                     + " filtro=acesso+dominio+tipo+versao"
                     + " rerank=" + rerank
                     + " diagnosticos=" + diagnosticos
+                    + " governanca=" + governanca
                     + " evita chunkSize=chunk_mal_dividido"
                     + " evita filtro=filtro_incorreto"
                     + " evita versao=documento_desatualizado";
@@ -140,6 +144,7 @@ public final class RetrievalEval {
             }
         }
         List<String> diagnosticos = diagnose(new CorpusCatalog(), config);
+        List<String> governanca = governanca(config);
         return new Report(
                 ratio(precisionSum, evidence),
                 ratio(recallSum, evidence),
@@ -151,7 +156,8 @@ public final class RetrievalEval {
                 config.overlap(),
                 config.topK(),
                 config.rerank(),
-                diagnosticos);
+                diagnosticos,
+                governanca);
     }
 
     public List<String> diagnose(CorpusCatalog catalog, RetrievalConfig config) {
@@ -182,6 +188,99 @@ public final class RetrievalEval {
         return List.copyOf(labels);
     }
 
+    public List<String> governanca(RetrievalConfig config) {
+        Map<String, String[]> catalogo = falhas();
+        List<String> linhas = new ArrayList<>();
+        if (respostaUsaExpirado()) {
+            linhas.add(linha(catalogo, "documento_expirado"));
+        }
+        if (topKInsuficiente(config)) {
+            linhas.add(linha(catalogo, "top_k_insuficiente"));
+        }
+        if (expansaoTrocaDominio()) {
+            linhas.add(linha(catalogo, "expansao_inadequada"));
+        }
+        if (rerankingFraco(config)) {
+            linhas.add(linha(catalogo, "reranking_fraco"));
+        }
+        return List.copyOf(linhas);
+    }
+
+    private Map<String, String[]> falhas() {
+        try (InputStream in = RetrievalEval.class.getResourceAsStream("/rag/falhas-governanca.json")) {
+            if (in == null) {
+                throw new IllegalStateException("falhas-governanca.json ausente");
+            }
+            Map<String, String[]> catalogo = new LinkedHashMap<>();
+            for (JsonNode node : MAPPER.readTree(in)) {
+                catalogo.put(node.path("id").asText(), new String[]{
+                        node.path("falha").asText(),
+                        node.path("acao").asText()
+                });
+            }
+            return catalogo;
+        } catch (IOException ex) {
+            throw new IllegalStateException("Falha ao ler falhas-governanca.json", ex);
+        }
+    }
+
+    private static String linha(Map<String, String[]> catalogo, String id) {
+        String[] item = catalogo.get(id);
+        if (item == null) {
+            throw new IllegalStateException("falha ausente: " + id);
+        }
+        return item[0] + " | " + item[1];
+    }
+
+    private static boolean respostaUsaExpirado() {
+        SourceDocument doc = SourceDocument.vigente(
+                "expirado", "expirado", "politica", "entregas", "v0", "2020-01-01", "operacao", "publico",
+                List.of(new SourceDocument.Section("prazo", "entrega prazo expirada")));
+        KnowledgeChunk chunk = new Chunker().chunk(doc.withStatus("expirado"), 240, 20).get(0);
+        RagAnswer answer = RagAnswer.cited(chunk, "entregas", 1);
+        return answer.found() && "expirado".equals(chunk.status());
+    }
+
+    private boolean topKInsuficiente(RetrievalConfig config) {
+        KnowledgeChunk primeiro = pedaco("a", "coletas", "janela", "coleta entrega alpha alpha");
+        KnowledgeChunk esperado = pedaco("b", "entregas", "prazo", "coleta entrega beta");
+        String query = "coleta entrega alpha";
+        RetrievalConfig estreito = config.withTopK(1).withMaxTopK(1).withHybridWeight(1).withRerank(false).withCutoff(0.1);
+        RetrievalConfig amplo = estreito.withMaxTopK(2);
+        Retriever.SearchFilter filtro = Retriever.SearchFilter.of("operador", null);
+        List<KnowledgeChunk> chunks = List.of(primeiro, esperado);
+        boolean deFora = retriever.search(chunks, query, filtro, estreito).stream()
+                .noneMatch(hit -> "b".equals(hit.chunk().docId()));
+        boolean dentro = retriever.search(chunks, query, filtro, amplo).stream()
+                .anyMatch(hit -> "b".equals(hit.chunk().docId()));
+        return deFora && dentro;
+    }
+
+    private static boolean expansaoTrocaDominio() {
+        String original = "prazo da coleta";
+        String ruim = QueryExpander.trocaDominio(original, "entrega");
+        return original.contains("coleta") && !ruim.contains("coleta") && ruim.contains("entrega");
+    }
+
+    private boolean rerankingFraco(RetrievalConfig config) {
+        KnowledgeChunk generico = pedaco("errado", "entregas", "prazo geral", "comprovante digital urgente");
+        KnowledgeChunk vigente = pedaco("certo", "comprovantes", "comprovante", "comprovante alpha beta gamma delta epsilon");
+        RetrievalConfig semRerank = config.withHybridWeight(0).withRerank(false).withCutoff(0.2).withTopK(2);
+        List<Retriever.Hit> hits = retriever.search(
+                List.of(generico, vigente),
+                "comprovante digital urgente",
+                Retriever.SearchFilter.of("operador", null),
+                semRerank);
+        return !hits.isEmpty() && !"comprovante".equals(hits.get(0).chunk().secao());
+    }
+
+    private static KnowledgeChunk pedaco(String doc, String dominio, String secao, String texto) {
+        SourceDocument source = SourceDocument.vigente(
+                doc, doc, "tipo", dominio, "v1", "2026-03-01", "operacao", "publico",
+                List.of(new SourceDocument.Section(secao, texto)));
+        return new Chunker().chunk(source, 240, 20).get(0);
+    }
+
     public void write(Path file, Report report) throws IOException {
         ObjectNode node = MAPPER.createObjectNode();
         node.put("precision", report.precision());
@@ -198,6 +297,10 @@ public final class RetrievalEval {
         ArrayNode labels = node.putArray("diagnosticos");
         for (String label : report.diagnosticos()) {
             labels.add(label);
+        }
+        ArrayNode governanca = node.putArray("governanca");
+        for (String item : report.governanca()) {
+            governanca.add(item);
         }
         node.put("evitaChunkMalDividido", "chunkSize");
         node.put("evitaFiltroIncorreto", "filtro");

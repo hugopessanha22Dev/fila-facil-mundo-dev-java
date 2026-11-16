@@ -11,6 +11,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -219,10 +220,10 @@ class AgentTest {
     @Test
     void avaliacaoCobreOsNoveCenariosEAsOitoMetricas() throws Exception {
         AgentEval eval = new AgentEval();
-        assertEquals(9, eval.scenarios().size());
+        assertEquals(13, eval.scenarios().size());
         AgentEval.Report report = eval.evaluate(rules(), AgentLimits.load());
         assertTrue(report.aprovado());
-        assertEquals(9, report.cenarios().size());
+        assertEquals(13, report.cenarios().size());
         String rendered = report.render();
         assertTrue(rendered.contains("sucesso"));
         assertTrue(rendered.contains("custoEstimado"));
@@ -232,7 +233,15 @@ class AgentTest {
         assertTrue(rendered.contains("falhas"));
         assertTrue(rendered.contains("escalonamentos"));
         assertTrue(rendered.contains("aderencia"));
-        assertTrue(rendered.contains("total=9"));
+        assertTrue(rendered.contains("total=13"));
+        assertTrue(rendered.contains("retries"));
+        assertTrue(rendered.contains("robustez"));
+        assertTrue(rendered.contains("seguranca"));
+        assertTrue(rendered.contains("qualidadeTrajetoria"));
+        List<String> ids = eval.scenarios().stream().map(AgentEval.Scenario::id).toList();
+        assertTrue(ids.containsAll(List.of(
+                "sucesso", "codigo-inexistente", "ambiguo", "consulta-indisponivel", "erro-registro",
+                "critico", "fora-escopo", "loop", "sem-dados-minimos")));
         AgentEval.ScenarioResult sucesso = report.cenarios().get(0);
         assertTrue(sucesso.sucesso());
         assertFalse(sucesso.ferramentas().isEmpty());
@@ -265,6 +274,9 @@ class AgentTest {
         String readme = Files.readString(Path.of("README.md"));
         assertTrue(readme.contains("exec:java@agent"));
         assertTrue(readme.contains("fora_dominio"));
+        assertTrue(readme.contains("tempo máximo"));
+        assertTrue(readme.contains("aprovação humana"));
+        assertTrue(readme.contains("plano barrado antes da chamada"));
         try (var files = Files.list(Path.of("src/test/resources/inference/golden"))) {
             long total = files.filter(path -> path.getFileName().toString().endsWith(".json")).count();
             assertEquals(3, total);

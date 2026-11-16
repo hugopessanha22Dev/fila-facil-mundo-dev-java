@@ -1,0 +1,10 @@
+{
+  "rateLimitPorTarefa": 4,
+  "rateLimitPorProvedor": 20,
+  "timeoutMs": 500,
+  "maxTentativas": 2,
+  "backoffInicialMs": 10,
+  "limiarCircuito": 2,
+  "cooldownMs": 1000,
+  "limiteRegressao": 0.05
+}

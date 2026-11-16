@@ -8,11 +8,53 @@
       "output": "{\"tipoSolicitacao\":\"consulta_entrega\",\"confianca\":0.9,\"precisaClarificacao\":false,\"perguntaClarificacao\":null}"
     },
     {
+      "id": "pos-classify-atraso",
+      "type": "positivo",
+      "taskId": "classify",
+      "input": "Cliente Demo informa atraso da entrega D-200.",
+      "output": "{\"tipoSolicitacao\":\"ocorrencia_operacional\",\"confianca\":0.86,\"precisaClarificacao\":false,\"perguntaClarificacao\":null}"
+    },
+    {
+      "id": "pos-classify-comprovante",
+      "type": "positivo",
+      "taskId": "classify",
+      "input": "Operador pede o comprovante da coleta E-10.",
+      "output": "{\"tipoSolicitacao\":\"comprovante\",\"confianca\":0.88,\"precisaClarificacao\":false,\"perguntaClarificacao\":null}"
+    },
+    {
+      "id": "contra-classify",
+      "type": "contraexemplo",
+      "taskId": "classify",
+      "input": "Mensagem sem intencao clara.",
+      "output": "{\"tipoSolicitacao\":\"consulta_entrega\",\"confianca\":0.99,\"precisaClarificacao\":false,\"perguntaClarificacao\":null}"
+    },
+    {
       "id": "neg-ambiguo",
       "type": "negativo",
       "taskId": "classify",
       "input": "Preciso de ajuda com isso urgente.",
       "output": "{\"tipoSolicitacao\":\"consulta_entrega\",\"confianca\":0.4,\"precisaClarificacao\":true,\"perguntaClarificacao\":\"Qual o codigo da entrega ou coleta?\"}"
+    },
+    {
+      "id": "pos-extract-codigo",
+      "type": "positivo",
+      "taskId": "extract",
+      "input": "Entrega D-201 do cliente Bruno Demo esta pendente.",
+      "output": "{\"campos\":{\"codigoEntrega\":{\"valor\":\"D-201\",\"origem\":\"fato\",\"evidencia\":\"D-201\"},\"cliente\":{\"valor\":\"Bruno Demo\",\"origem\":\"fato\",\"evidencia\":\"Bruno Demo\"}}}"
+    },
+    {
+      "id": "pos-extract-status",
+      "type": "positivo",
+      "taskId": "extract",
+      "input": "A coleta F-12 segue em rota.",
+      "output": "{\"campos\":{\"codigoEntrega\":{\"valor\":\"F-12\",\"origem\":\"fato\",\"evidencia\":\"F-12\"},\"status\":{\"valor\":\"em_rota\",\"origem\":\"fato\",\"evidencia\":\"em rota\"}}}"
+    },
+    {
+      "id": "pos-extract-sem-prazo",
+      "type": "positivo",
+      "taskId": "extract",
+      "input": "Cliente Demo nao informou prazo da entrega G-3.",
+      "output": "{\"campos\":{\"codigoEntrega\":{\"valor\":\"G-3\",\"origem\":\"fato\",\"evidencia\":\"G-3\"},\"prazo\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null}}}"
     },
     {
       "id": "contra-status",
@@ -22,11 +64,123 @@
       "output": "{\"campos\":{\"status\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null},\"codigoEntrega\":{\"valor\":null,\"origem\":\"ausente\",\"evidencia\":null}}}"
     },
     {
+      "id": "pos-sum-1",
+      "type": "positivo",
+      "taskId": "summarize",
+      "input": "Turno 1: cliente perguntou a entrega H-1. Turno 2: operador confirmou status pendente.",
+      "output": "{\"resumo\":\"Entrega H-1 segue pendente\",\"eventos\":[\"pergunta\",\"confirmacao pendente\"],\"inventou\":false}"
+    },
+    {
+      "id": "pos-sum-2",
+      "type": "positivo",
+      "taskId": "summarize",
+      "input": "Historico: endereco corrigido para a entrega H-2 e nova tentativa agendada.",
+      "output": "{\"resumo\":\"Endereco de H-2 corrigido e nova tentativa registrada\",\"eventos\":[\"correcao\",\"nova tentativa\"],\"inventou\":false}"
+    },
+    {
+      "id": "pos-sum-3",
+      "type": "positivo",
+      "taskId": "summarize",
+      "input": "Historico curto: coleta H-3 concluida no balcao.",
+      "output": "{\"resumo\":\"Coleta H-3 concluida no balcao\",\"eventos\":[\"conclusao\"],\"inventou\":false}"
+    },
+    {
+      "id": "contra-sum",
+      "type": "contraexemplo",
+      "taskId": "summarize",
+      "input": "Historico sem prazo.",
+      "output": "{\"resumo\":\"Prazo de 2 dias confirmado\",\"eventos\":[\"prazo inventado\"],\"inventou\":true}"
+    },
+    {
+      "id": "pos-reply-1",
+      "type": "positivo",
+      "taskId": "internal-reply",
+      "input": "Operador precisa responder que a entrega I-1 esta pendente.",
+      "output": "{\"resposta\":\"A entrega I-1 esta pendente.\",\"inferencias\":[],\"proximaAcao\":\"informar status\"}"
+    },
+    {
+      "id": "pos-reply-2",
+      "type": "positivo",
+      "taskId": "internal-reply",
+      "input": "Falta o codigo para responder o cliente.",
+      "output": "{\"resposta\":\"Preciso do codigo da entrega para continuar.\",\"inferencias\":[],\"proximaAcao\":\"pedir codigo\"}"
+    },
+    {
+      "id": "pos-reply-3",
+      "type": "positivo",
+      "taskId": "internal-reply",
+      "input": "Comprovante da entrega I-3 localizado.",
+      "output": "{\"resposta\":\"O comprovante da entrega I-3 foi localizado.\",\"inferencias\":[],\"proximaAcao\":\"enviar comprovante\"}"
+    },
+    {
+      "id": "contra-reply",
+      "type": "contraexemplo",
+      "taskId": "internal-reply",
+      "input": "Cliente pergunta o prazo e ninguem informou.",
+      "output": "{\"resposta\":\"O prazo e amanha as 10h.\",\"inferencias\":[],\"proximaAcao\":\"afirmar prazo\"}"
+    },
+    {
       "id": "esc-humano",
       "type": "escalacao",
       "taskId": "internal-reply",
       "input": "Cliente ameaca Procon e pede contato imediato sobre perda do pacote R-77.",
       "output": "{\"prioridadeSugerida\":\"alta\",\"proximaAcao\":\"Encaminhar para atendimento humano\",\"intervencencaoHumana\":true,\"justificativaIntervencencao\":\"Escalacao com risco reputacional\"}"
+    },
+    {
+      "id": "pos-transform-1",
+      "type": "positivo",
+      "taskId": "transform",
+      "input": "Cliente Carla Demo, entrega J-1, status pendente.",
+      "output": "{\"codigoEntrega\":\"J-1\",\"cliente\":\"Carla Demo\",\"status\":\"pendente\",\"conclusaoPronta\":true}"
+    },
+    {
+      "id": "pos-transform-2",
+      "type": "positivo",
+      "taskId": "transform",
+      "input": "Entrega J-2 em rota para o cliente Demo Norte.",
+      "output": "{\"codigoEntrega\":\"J-2\",\"cliente\":\"Demo Norte\",\"status\":\"em_rota\",\"conclusaoPronta\":true}"
+    },
+    {
+      "id": "pos-transform-3",
+      "type": "positivo",
+      "taskId": "transform",
+      "input": "Coleta J-3 concluida, cliente Demo Sul.",
+      "output": "{\"codigoEntrega\":\"J-3\",\"cliente\":\"Demo Sul\",\"status\":\"concluida\",\"conclusaoPronta\":true}"
+    },
+    {
+      "id": "contra-transform",
+      "type": "contraexemplo",
+      "taskId": "transform",
+      "input": "Texto sem codigo e sem status.",
+      "output": "{\"codigoEntrega\":\"ZZ-999\",\"cliente\":\"Inventado\",\"status\":\"concluida\",\"conclusaoPronta\":true}"
+    },
+    {
+      "id": "pos-prio-1",
+      "type": "positivo",
+      "taskId": "priorizar",
+      "input": "Ocorrencia com evidencia de rota bloqueada na entrega K-1.",
+      "output": "{\"etapas\":[\"intencao\",\"entidades\",\"evidencias\",\"resposta\"],\"prioridadeComoFato\":true,\"incerteza\":false}"
+    },
+    {
+      "id": "pos-prio-2",
+      "type": "positivo",
+      "taskId": "priorizar",
+      "input": "Cliente ausente registrado pela ferramenta consultarStatusEntrega na entrega K-2.",
+      "output": "{\"etapas\":[\"intencao\",\"entidades\",\"evidencias\",\"resposta\"],\"prioridadeComoFato\":true,\"incerteza\":false}"
+    },
+    {
+      "id": "pos-prio-3",
+      "type": "positivo",
+      "taskId": "priorizar",
+      "input": "Sem evidencia para priorizar a entrega K-3.",
+      "output": "{\"etapas\":[\"intencao\",\"entidades\",\"evidencias\",\"resposta\"],\"prioridadeComoFato\":false,\"incerteza\":true}"
+    },
+    {
+      "id": "contra-prio",
+      "type": "contraexemplo",
+      "taskId": "priorizar",
+      "input": "Mensagem sem evidencia.",
+      "output": "{\"etapas\":[\"resposta\"],\"prioridadeComoFato\":true,\"prioridade\":\"critica\",\"incerteza\":false}"
     }
   ]
 }

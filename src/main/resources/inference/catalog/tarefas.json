@@ -1,0 +1,79 @@
+{
+  "tarefas": [
+    {
+      "id": "classificacao",
+      "qualidadeMinima": 0.7,
+      "tetoCusto": 0.001,
+      "tetoLatenciaMs": 800,
+      "risco": "baixo",
+      "idioma": "pt-BR",
+      "janela": "curta",
+      "toolUse": false,
+      "privacidade": "baixa",
+      "formato": "texto",
+      "streaming": false,
+      "cachePermitido": true,
+      "groundednessObrigatoria": false
+    },
+    {
+      "id": "extracao",
+      "qualidadeMinima": 0.9,
+      "tetoCusto": 0.01,
+      "tetoLatenciaMs": 2000,
+      "risco": "alto",
+      "idioma": "pt-BR",
+      "janela": "media",
+      "toolUse": false,
+      "privacidade": "alta",
+      "formato": "json",
+      "streaming": false,
+      "cachePermitido": false,
+      "groundednessObrigatoria": false
+    },
+    {
+      "id": "resumo",
+      "qualidadeMinima": 0.75,
+      "tetoCusto": 0.004,
+      "tetoLatenciaMs": 1500,
+      "risco": "medio",
+      "idioma": "pt-BR",
+      "janela": "media",
+      "toolUse": false,
+      "privacidade": "media",
+      "formato": "texto",
+      "streaming": true,
+      "cachePermitido": false,
+      "groundednessObrigatoria": false
+    },
+    {
+      "id": "resposta_assistida",
+      "qualidadeMinima": 0.85,
+      "tetoCusto": 0.02,
+      "tetoLatenciaMs": 3000,
+      "risco": "alto",
+      "idioma": "pt-BR",
+      "janela": "media",
+      "toolUse": true,
+      "privacidade": "alta",
+      "formato": "json",
+      "streaming": true,
+      "cachePermitido": false,
+      "groundednessObrigatoria": false
+    },
+    {
+      "id": "busca_contextual",
+      "qualidadeMinima": 0.85,
+      "tetoCusto": 0.015,
+      "tetoLatenciaMs": 2500,
+      "risco": "medio",
+      "idioma": "pt-BR",
+      "janela": "longa",
+      "toolUse": false,
+      "privacidade": "alta",
+      "formato": "texto",
+      "streaming": false,
+      "cachePermitido": false,
+      "groundednessObrigatoria": true
+    }
+  ]
+}

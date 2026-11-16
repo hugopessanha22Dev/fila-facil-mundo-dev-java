@@ -29,6 +29,8 @@ public final class OpsWorld {
     private final List<Escalation> escalations = new ArrayList<>();
     private boolean consultaIndisponivel;
     private boolean erroEscrita;
+    private int falhasTemporarias;
+    private boolean erroPermanente;
 
     public static OpsWorld demo() {
         OpsWorld world = new OpsWorld();
@@ -95,5 +97,29 @@ public final class OpsWorld {
 
     public void setErroEscrita(boolean erroEscrita) {
         this.erroEscrita = erroEscrita;
+    }
+
+    public int falhasTemporarias() {
+        return falhasTemporarias;
+    }
+
+    public void setFalhasTemporarias(int falhasTemporarias) {
+        this.falhasTemporarias = falhasTemporarias;
+    }
+
+    public boolean consumirFalhaTemporaria() {
+        if (falhasTemporarias <= 0) {
+            return false;
+        }
+        falhasTemporarias--;
+        return true;
+    }
+
+    public boolean erroPermanente() {
+        return erroPermanente;
+    }
+
+    public void setErroPermanente(boolean erroPermanente) {
+        this.erroPermanente = erroPermanente;
     }
 }

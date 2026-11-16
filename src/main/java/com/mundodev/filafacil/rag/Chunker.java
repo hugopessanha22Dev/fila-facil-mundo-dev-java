@@ -40,6 +40,10 @@ public final class Chunker {
                 doc.acesso(),
                 secao,
                 texto,
+                doc.status(),
+                doc.conteudoHash(),
+                doc.tenant(),
+                doc.namespace(),
                 TokenEmbedder.embed(texto));
     }
 

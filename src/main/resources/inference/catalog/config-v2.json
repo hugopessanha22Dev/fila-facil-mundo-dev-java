@@ -1,0 +1,45 @@
+{
+  "versao": "v2",
+  "tarefas": {
+    "classificacao": {
+      "temperature": 0.3,
+      "topP": 0.9,
+      "maxTokens": 380,
+      "stop": ["END"],
+      "seed": 42,
+      "streaming": false
+    },
+    "extracao": {
+      "temperature": 0.2,
+      "topP": 0.8,
+      "maxTokens": 800,
+      "stop": [],
+      "seed": 42,
+      "streaming": false
+    },
+    "resumo": {
+      "temperature": 0.45,
+      "topP": 0.9,
+      "maxTokens": 480,
+      "stop": ["END"],
+      "seed": 42,
+      "streaming": true
+    },
+    "resposta_assistida": {
+      "temperature": 0.25,
+      "topP": 0.85,
+      "maxTokens": 680,
+      "stop": ["END"],
+      "seed": 42,
+      "streaming": true
+    },
+    "busca_contextual": {
+      "temperature": 0.15,
+      "topP": 0.8,
+      "maxTokens": 600,
+      "stop": ["END"],
+      "seed": 42,
+      "streaming": false
+    }
+  }
+}

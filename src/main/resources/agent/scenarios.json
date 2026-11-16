@@ -61,5 +61,37 @@
     "consultaIndisponivel": false,
     "erroEscrita": false,
     "parada": "argumento_invalido"
+  },
+  {
+    "id": "erro-temporario",
+    "texto": "cliente pergunta status da entrega atrasada codigo ENT-100",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "falhasTemporarias": 1,
+    "erroPermanente": false,
+    "parada": "resolvido"
+  },
+  {
+    "id": "erro-permanente",
+    "texto": "cliente pergunta status da entrega atrasada codigo ENT-100",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "falhasTemporarias": 0,
+    "erroPermanente": true,
+    "parada": "escalado"
+  },
+  {
+    "id": "plano-inseguro",
+    "texto": "plano inseguro de alterar status",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "plano_bloqueado"
+  },
+  {
+    "id": "aguardando-aprovacao",
+    "texto": "notificar entrega impacto alto codigo ENT-100 sem aprovacao",
+    "consultaIndisponivel": false,
+    "erroEscrita": false,
+    "parada": "aguardando_aprovacao"
   }
 ]

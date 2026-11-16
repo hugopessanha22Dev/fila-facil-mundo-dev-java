@@ -12,7 +12,7 @@ import java.util.Set;
 public class PromptLibrary {
 
     public static final List<String> REQUIRED_IDS = List.of(
-            "classify", "extract", "summarize", "internal-reply", "transform");
+            "classify", "extract", "summarize", "internal-reply", "transform", "priorizar");
 
     private final Map<String, PromptDefinition> prompts;
 

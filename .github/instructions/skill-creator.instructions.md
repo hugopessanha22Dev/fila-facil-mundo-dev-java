@@ -2,7 +2,7 @@
 name: "skill-creator"
 description: "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy."
 applyTo: "**/*"
-deployedAt: "2026-11-12T17:53:01.162Z"
+deployedAt: "2026-11-16T20:54:06.638Z"
 ---
 
 # skill-creator
