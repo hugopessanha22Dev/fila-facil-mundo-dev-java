@@ -222,6 +222,28 @@ Paradas:
 
 Ação sensível só grava depois de o schema passar. O trace marca `confirmado` e, em seguida, `gravado`. `eval` mede sucesso, custo estimado, latência, passos, ferramentas, falhas, escalonamentos e aderência, e também retries, robustez, segurança e qualidade da trajetória. Sai com código 0 só quando os treze cenários de `agent/scenarios.json` batem a parada esperada. Esses cenários ficam fora dos 3 casos do eval antigo.
 
+## Orquestracao de IA
+
+Uma entrada classifica o pedido e delega ao fluxo ja existente: atendimento, triagem, busca, agente, classificador ou resumo. Embedding, reprocessamento e lote voltam com status `aceito` e so correm quando o worker e chamado. Vetor indisponivel responde `Nao encontrado nos documentos.` O modelo principal indisponivel usa a alternativa do gateway ja existente. Acao que o agente escala fica em `revisao_humana`. O menu do terminal continua nas opcoes 0 a 12.
+
+```powershell
+mvn -q compile exec:java@ai-orquestracao "-Dexec.args=run --text classificar prioridade da entrega"
+mvn -q compile exec:java@ai-orquestracao "-Dexec.args=eval"
+```
+
+As decisoes ficam em `docs/orquestracao/`. O dataset fica em `orquestracao/casos.json`, fora dos 3 casos do eval antigo e fora dos cenarios do agente.
+
+## AI Ops
+
+O controle de operacao cataloga atendimento, RAG de politicas, agente e classificador. O gate compara a versao atual com a candidata e bloqueia piora de groundedness, formato, ferramenta, seguranca ou custo. Queda leve de relevancia vira alerta e a promocao segue. Pedido para ignorar as regras ou mostrar o prompt e recusado. Segredo e numero longo saem mascarados do trace. Um incidente bloqueia so o fluxo afetado. O menu do terminal continua nas opcoes 0 a 12.
+
+```powershell
+mvn -q compile exec:java@ai-ops "-Dexec.args=catalogo"
+mvn -q compile exec:java@ai-ops "-Dexec.args=gate alerta"
+```
+
+O golden fica em `aiops/golden.json`, fora dos 3 casos do eval antigo.
+
 ## Orquestrador de exceções
 
 O orquestrador trata exceção de entrega num domínio isolado: abrir, analisar, escalar, resolver, cancelar e consultar. O estado vive em memória e acaba quando o processo termina. O menu do terminal continua nas opções 0 a 12. Nada disso grava `data/coletas.json`.

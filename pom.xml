@@ -188,6 +188,18 @@
                             <mainClass>com.mundodev.filafacil.inference.catalog.CatalogMain</mainClass>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>ai-orquestracao</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.orquestracao.OrquestracaoMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ai-ops</id>
+                        <configuration>
+                            <mainClass>com.mundodev.filafacil.aiops.AiOpsMain</mainClass>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

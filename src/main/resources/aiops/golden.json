@@ -1,0 +1,52 @@
+[
+  {
+    "id": "sem-evidencia",
+    "cenario": "bloqueio",
+    "versao": "v2",
+    "atual": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0},
+    "candidata": {"groundedness": 0.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0}
+  },
+  {
+    "id": "formato",
+    "cenario": "bloqueio",
+    "versao": "v2",
+    "atual": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0},
+    "candidata": {"groundedness": 1.0, "formato": 0.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0}
+  },
+  {
+    "id": "ferramenta",
+    "cenario": "bloqueio",
+    "versao": "v2",
+    "atual": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0},
+    "candidata": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 0.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0}
+  },
+  {
+    "id": "seguranca",
+    "cenario": "bloqueio",
+    "versao": "v2",
+    "atual": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0},
+    "candidata": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 0.0, "custo": 0.2, "relevancia": 1.0}
+  },
+  {
+    "id": "custo",
+    "cenario": "bloqueio",
+    "versao": "v2",
+    "atual": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0},
+    "candidata": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 2.0, "relevancia": 1.0}
+  },
+  {
+    "id": "relevancia-leve",
+    "cenario": "alerta",
+    "versao": "v2",
+    "atual": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0},
+    "candidata": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 0.8}
+  },
+  {
+    "id": "caso-ambiguo",
+    "cenario": "ambiguo",
+    "versao": "v2",
+    "ambiguo": true,
+    "atual": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0},
+    "candidata": {"groundedness": 1.0, "formato": 1.0, "ferramenta": 1.0, "seguranca": 1.0, "custo": 0.2, "relevancia": 1.0}
+  }
+]

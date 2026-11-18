@@ -1,0 +1,11 @@
+[
+  {"id": "atendimento", "texto": "cliente pergunta a regra do comprovante", "fluxo": "atendimento", "ausencia": false},
+  {"id": "triagem", "texto": "triagem da ocorrencia de volume", "fluxo": "triagem", "ausencia": false},
+  {"id": "busca", "texto": "operador busca a politica de prazo", "fluxo": "busca", "ausencia": false},
+  {"id": "agente", "texto": "cliente pergunta status da entrega atrasada codigo ENT-100", "fluxo": "agente", "ausencia": false},
+  {"id": "classificador", "texto": "classificar prioridade da entrega", "fluxo": "classificador", "ausencia": false},
+  {"id": "resumo", "texto": "resumir historico operacional", "fluxo": "resumo", "ausencia": false},
+  {"id": "vetor", "texto": "operador busca a politica de prazo", "fluxo": "busca", "vetorIndisponivel": true, "ausencia": true},
+  {"id": "modelo", "texto": "classificar prioridade da entrega", "fluxo": "classificador", "falhasModelo": 1, "ausencia": false},
+  {"id": "classificador-vetor", "texto": "classificar prioridade da entrega", "fluxo": "classificador", "vetorIndisponivel": true, "ausencia": false}
+]

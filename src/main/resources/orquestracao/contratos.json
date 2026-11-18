@@ -1,0 +1,12 @@
+{
+  "integracoes": [
+    {"nome": "modelo", "entrada": "texto", "saida": "resposta", "erro": "indisponivel", "timeoutMs": 50, "tentativas": 2, "acesso": "operador", "limiteUso": 2},
+    {"nome": "vetor", "entrada": "consulta", "saida": "trechos", "erro": "ausencia", "timeoutMs": 50, "tentativas": 2, "acesso": "operador", "limiteUso": 2},
+    {"nome": "coletas", "entrada": "codigo", "saida": "status", "erro": "indisponivel", "timeoutMs": 50, "tentativas": 2, "acesso": "operador", "limiteUso": 2},
+    {"nome": "entregas", "entrada": "codigo", "saida": "status", "erro": "indisponivel", "timeoutMs": 50, "tentativas": 2, "acesso": "operador", "limiteUso": 2},
+    {"nome": "ocorrencias", "entrada": "codigo", "saida": "registro", "erro": "escrita", "timeoutMs": 50, "tentativas": 2, "acesso": "operador", "limiteUso": 2},
+    {"nome": "store", "entrada": "consulta", "saida": "linha", "erro": "isolado", "timeoutMs": 50, "tentativas": 2, "acesso": "operador", "limiteUso": 2},
+    {"nome": "ferramenta-externa", "entrada": "codigo", "saida": "endereco", "erro": "limite", "timeoutMs": 50, "tentativas": 2, "acesso": "operador", "limiteUso": 2},
+    {"nome": "fila", "entrada": "trabalho", "saida": "status", "erro": "timeout", "timeoutMs": 10, "tentativas": 2, "acesso": "operador", "limiteUso": 2}
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "fluxos": [
+    {
+      "id": "atendimento",
+      "dono": "operacao",
+      "risco": "resposta sem evidencia",
+      "modelo": "mock-light",
+      "prompt": "responda so com a regra citada",
+      "entrada": "mensagem",
+      "saida": "resposta",
+      "ferramentas": ["consultar_regra"],
+      "argumentos": {"consultar_regra": ["codigo"]},
+      "fonte": "indice de politicas",
+      "metricas": [
+        {"nome": "groundedness", "regra": "respostas com evidencia divididas pelo total", "limite": 1.0, "dono": "operacao", "consequencia": "bloqueio"},
+        {"nome": "relevancia", "regra": "respostas no tema divididas pelo total", "limite": 0.5, "dono": "operacao", "consequencia": "alerta"},
+        {"nome": "custo", "regra": "custo estimado da execucao", "limite": 1.0, "dono": "operacao", "consequencia": "bloqueio"}
+      ]
+    },
+    {
+      "id": "rag",
+      "dono": "conhecimento",
+      "risco": "citacao ausente",
+      "modelo": "mock-light",
+      "prompt": "cite o documento usado",
+      "entrada": "pergunta",
+      "saida": "trecho e fonte",
+      "ferramentas": ["buscar_politica"],
+      "argumentos": {"buscar_politica": ["consulta"]},
+      "fonte": "indice de politicas",
+      "metricas": [
+        {"nome": "groundedness", "regra": "citacoes validas divididas pelo total", "limite": 1.0, "dono": "conhecimento", "consequencia": "bloqueio"}
+      ]
+    },
+    {
+      "id": "agente",
+      "dono": "atendimento",
+      "risco": "acao fora do dominio",
+      "modelo": "mock-light",
+      "prompt": "use so a ferramenta do escopo",
+      "entrada": "ocorrencia",
+      "saida": "acao",
+      "ferramentas": ["consultar_coleta", "registrar_ocorrencia"],
+      "argumentos": {"consultar_coleta": ["codigo"], "registrar_ocorrencia": ["codigo", "tipo"]},
+      "fonte": "store operacional",
+      "metricas": [
+        {"nome": "groundedness", "regra": "acoes com evidencia divididas pelo total", "limite": 1.0, "dono": "atendimento", "consequencia": "bloqueio"}
+      ]
+    },
+    {
+      "id": "classificador",
+      "dono": "triagem",
+      "risco": "prioridade incorreta",
+      "modelo": "mock-light",
+      "prompt": "devolva a prioridade em json",
+      "entrada": "descricao",
+      "saida": "prioridade",
+      "ferramentas": ["classificar_prioridade"],
+      "argumentos": {"classificar_prioridade": ["descricao"]},
+      "fonte": "historico de entregas",
+      "metricas": [
+        {"nome": "groundedness", "regra": "classificacoes coerentes divididas pelo total", "limite": 1.0, "dono": "triagem", "consequencia": "bloqueio"},
+        {"nome": "custo", "regra": "custo estimado da classificacao", "limite": 1.0, "dono": "triagem", "consequencia": "bloqueio"}
+      ]
+    }
+  ]
+}
